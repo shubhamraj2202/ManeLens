@@ -240,9 +240,18 @@ Plus 3 free credits on first install. Margin math: Standard pack @ $7.99 → ~$6
 ## Session Status
 
 **Last Updated:** 2026-05-16
-**Current State:** Full UI scaffolded from Claude Design handoff. All 9 screens implemented in SwiftUI.
-**What's Working:** All screens render — Onboarding (3 slides), Home (style grid + search + FAB), Style Detail (photo upload + tips), Custom Prompt (text area + chip suggestions), Generating (animated lens), Result (before/after drag slider), Paywall (3 credit packs), History (grid + empty state), Settings (grouped list + toggles). Navigation state machine in ContentView.swift. Design system tokens, shared components, and HairStyle catalog all in place.
-**Next Step:** **Session 0** still required — validate Nano Banana prompt template via curl before wiring real API. See `SESSION_00_VALIDATION.md`. After that: Session 5 (Cloudflare Worker) → Session 6 (APIClient wire-up).
+**Current State:** Full UI scaffolded from Claude Design handoff. All 9 screens compile and run.
+**What's Working:**
+- All 9 screens: Onboarding (3 animated slides), Home (style grid + search + category chips + FAB), Style Detail (hero image + photo upload + collapsible tips + CTA), Custom Prompt (text area + FlowLayout suggestion chips), Generating (orbiting particle animation + rotating tips + progress bar), Result (draggable before/after slider + action bar + feedback), Paywall (3 credit packs + BEST VALUE badge), History (card grid + empty state), Settings (grouped iOS list + toggles + segmented picker)
+- Design system: `DesignSystem.swift` with brand tokens (purple #7C3AED, pink #EC4899), `PrimaryButton`, `CreditPill`, `CategoryChip`, `ScreenNav`
+- Shared components: `HairFaceView` (SwiftUI face/hair silhouette), `StyleCardView`, `PhotoUploadZone`, `PhotoPickerSheet` (bottom sheet with recent photos + camera/library/files options), `BeforeAfterSlider`
+- `@Observable AppState` wiring credits, photo state, history, selected style
+- `HairStyle` catalog (6 styles: Classic Groom, Korean Wolf Cut, Indian Bridal Updo, French Crop Fade, Beach Waves, Curtain Bangs)
+- Enum-based navigation state machine in `ContentView.swift`
+- Bug fix: `SettingsRow` argument order corrected (`hasChevron` before `trailing`)
+
+**Known Issues:** None blocking. SourceKit shows cross-file errors in editor — these are resolved at Xcode build time (normal for multi-file projects).
+**Next Step:** **Session 0** still required — validate Nano Banana prompt template via curl on 10 selfies before wiring real API. See `SESSION_00_VALIDATION.md`. After pass: Session 5 (Cloudflare Worker) → Session 6 (APIClient wire-up).
 
 ---
 

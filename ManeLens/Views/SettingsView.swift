@@ -28,7 +28,7 @@ struct SettingsView: View {
                             }
                         ))
                         Divider().padding(.leading, 16)
-                        SettingsRow(label: "Restore Purchases", trailing: AnyView(chevron), hasChevron: false)
+                        SettingsRow(label: "Restore Purchases", hasChevron: false, trailing: AnyView(chevron))
                     }
 
                     // Preferences
