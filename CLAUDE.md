@@ -239,27 +239,45 @@ Plus 3 free credits on first install. Margin math: Standard pack @ $7.99 → ~$6
 
 ## Session Status
 
-**Last Updated:** 2026-05-16
-**Current State:** Full UI scaffolded from Claude Design handoff. All 9 screens compile and run.
+**Last Updated:** 2026-05-17
+**Current State:** Session 0 API run complete (50/50). Awaiting manual quality scoring before green-light.
 **What's Working:**
 - All 9 screens: Onboarding (3 animated slides), Home (style grid + search + category chips + FAB), Style Detail (hero image + photo upload + collapsible tips + CTA), Custom Prompt (text area + FlowLayout suggestion chips), Generating (orbiting particle animation + rotating tips + progress bar), Result (draggable before/after slider + action bar + feedback), Paywall (3 credit packs + BEST VALUE badge), History (card grid + empty state), Settings (grouped iOS list + toggles + segmented picker)
 - Design system: `DesignSystem.swift` with brand tokens (purple #7C3AED, pink #EC4899), `PrimaryButton`, `CreditPill`, `CategoryChip`, `ScreenNav`
-- Shared components: `HairFaceView` (SwiftUI face/hair silhouette), `StyleCardView`, `PhotoUploadZone`, `PhotoPickerSheet` (bottom sheet with recent photos + camera/library/files options), `BeforeAfterSlider`
+- Shared components: `HairFaceView`, `StyleCardView`, `PhotoUploadZone`, `PhotoPickerSheet`, `BeforeAfterSlider`
 - `@Observable AppState` wiring credits, photo state, history, selected style
-- `HairStyle` catalog (6 styles: Classic Groom, Korean Wolf Cut, Indian Bridal Updo, French Crop Fade, Beach Waves, Curtain Bangs)
-- Enum-based navigation state machine in `ContentView.swift`
-- Bug fix: `SettingsRow` argument order corrected (`hasChevron` before `trailing`)
+- `HairStyle` catalog (6 styles), enum-based navigation state machine
+- Session 0 script: 50/50 API calls succeeded · ~10s avg per call · ~53s per photo (5 styles) · 8m 59s total wall clock
+- Auth fix: `x-goog-api-key` header · Response parsing fix: `inlineData` (camelCase) + `inline_data`
 
-**Known Issues:** None blocking. SourceKit shows cross-file errors in editor — these are resolved at Xcode build time (normal for multi-file projects).
-**Next Step:** **Session 0** still required — validate Nano Banana prompt template via curl on 10 selfies before wiring real API. See `SESSION_00_VALIDATION.md`. After pass: Session 5 (Cloudflare Worker) → Session 6 (APIClient wire-up).
+**Known Issues:** None blocking. SourceKit cross-file errors resolve at Xcode build time (normal).
+**Next Step:** Manual review of 50 images in `hairlens-worker/prompt-results/` → fill `SCORES.md` → if Identity ≥90% / Realism ≥80% / Background ≥90% → **SESSION 0 PASS** → proceed to Session 5 (Cloudflare Worker scaffold).
 
 ---
 
 ## Future Features (V2+)
 
+### Reference Photo Style Matching
+Upload an inspiration photo (e.g. a celebrity or magazine cut) and the app extracts the style and applies it to the user's selfie.
+- **UX:** Second optional photo upload zone on Style Detail + Custom Prompt screens, labelled "Add reference photo"
+- **Worker:** When `referenceImageBase64` is present, `buildHairPrompt()` switches to a two-image prompt: image 1 = user selfie, image 2 = reference, instruction = "copy the exact hairstyle from image 2 onto the person in image 1"
+- **Gemini:** Nano Banana supports multi-image input — pass both inline_data parts in the same `contents` array
+- **Pricing:** Same credit cost (1 credit) — single Gemini call regardless of input count
+- **Constraint:** Validate reference photo has detectable hair via Vision before sending (prevents wasted API calls)
+- **File changes when implemented:** `CustomPromptView.swift`, `StyleDetailView.swift`, `PhotoUploadZone.swift` (add `referencePhoto` mode), `APIClient.swift` (add `referenceImageBase64` param), `prompts.ts` on Worker
+
+### Beard Styling
+Apply barber-grade beard style transformations independently of (or alongside) hair changes.
+- **UX:** New "Beard" category chip on Home screen; style cards show beard preview renders; beard toggle on Style Detail ("Style beard too?")
+- **Prompt variant:** Separate `buildBeardPrompt()` on Worker — identical preservation rules but targets facial hair region only. When both hair + beard are requested, a combined prompt targets both regions in one call
+- **Catalog additions:** 5 initial beard styles — Clean Shave, Short Box Beard, Full Beard, Goatee, Designer Stubble
+- **FaceValidator:** Add `VNDetectFaceLandmarksRequest` check for lower-face landmark coverage (chin, jaw) before beard calls
+- **Constraint:** `buildBeardPrompt()` must go through same Session 0–style regression before shipping (5 beard styles × 10 selfies with beards/stubble)
+- **File changes when implemented:** `HairStyle.swift` (add `StyleType: hair | beard | both`), `StyleCatalog.swift`, `prompts.ts` (add `buildBeardPrompt()`), `StyleDetailView.swift` (beard toggle), `FaceValidator.swift`
+
+### Other (lower priority)
 - Real-time AR live preview (ARKit + on-device hair segmentation)
 - Multi-face support
 - Hair color picker UI (separate from style)
 - Salon B2B mode — consultation tool for stylists, web companion
-- Style upload from inspiration photo (Gemini text mode extracts description → feeds into image edit)
 - Localized App Store listings: Hindi, Japanese, English
