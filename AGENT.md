@@ -1,4 +1,4 @@
-# HairLens — Claude Code Agent Instructions
+# ManeLens — Claude Code Agent Instructions
 
 ## How to Start Every Session
 
@@ -103,11 +103,11 @@ When done, update Session Status in CLAUDE.md, commit, push.
 | # | Task | Files | Blocker for |
 |---|------|-------|-------------|
 | **0** | **GO/NO-GO**: validate Nano Banana prompt via curl on 10 selfies | Worker repo only | Everything |
-| 1 | Xcode project scaffold: targets, bundle ID, SwiftData container, app icon | HairLensApp.swift, AppState.swift | All iOS |
+| 1 | Xcode project scaffold: targets, bundle ID, SwiftData container, app icon | ManeLensApp.swift, AppState.swift | All iOS |
 | 2 | FaceValidator service + tests | FaceValidator.swift | 6 |
 | 3 | ImageProcessor service + tests | ImageProcessor.swift | 6 |
 | 4 | Style catalog JSON (30 entries) + loader | StyleCatalog.json, StyleCatalog.swift | 7 |
-| 5 | Cloudflare Worker scaffold + Gemini call (no credit gate yet) | hairlens-worker repo | 6 |
+| 5 | Cloudflare Worker scaffold + Gemini call (no credit gate yet) | aurax-api repo | 6 |
 | 6 | APIClient + minimal generate flow (hardcoded "free mode") | APIClient.swift | 8 |
 | 7 | StylePickerView + InputView (UI, wired to APIClient) | StylePickerView.swift, InputView.swift | 8 |
 | 8 | GeneratingView + ResultView with before/after slider | ResultView.swift, BeforeAfterSlider.swift | 9 |

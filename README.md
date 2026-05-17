@@ -44,8 +44,8 @@ Credit-based, no subscription. 3 free generations on first install.
 
 Requires Xcode 16+, iOS 18 SDK, physical device. Apple Developer team `48BYR3J82W`.
 
-1. Clone this repo and the sibling `mane-worker` repo
-2. Open `Mane.xcodeproj`
+1. Clone this repo and the sibling [`aurax-api`](https://github.com/shubhamraj2202/aurax-api) repo
+2. Open `ManeLens.xcodeproj`
 3. Set the Worker URL in `Services/APIClient.swift`
 4. Select your device, build, run
 

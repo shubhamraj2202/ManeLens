@@ -118,7 +118,7 @@ User picks photo → FaceValidator.validate()
 ## Key Services
 
 ### APIClient
-- Single endpoint: `POST https://mane-worker.<account>.workers.dev/generate`
+- Single endpoint: `POST https://aurax-api.<account>.workers.dev/hair/generate`
 - Body: `{ deviceId, receipt, imageBase64, styleId?, customPrompt? }`
 - Response: `{ image: base64, mimeType, creditsRemaining }` or `{ error: code, message }`
 - Timeout: 30s (Nano Banana typically 6–12s)

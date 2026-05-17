@@ -3,7 +3,7 @@
 **Status:** Not started
 **Blocker for:** All subsequent sessions
 **Budget:** ~30 minutes wall time, ~$2 in API costs
-**Files touched:** `hairlens-worker/scripts/validate.sh`, `test-selfies/`, `prompt-results/`, `prompt-results/SCORES.md`
+**Files touched:** `aurax-api/scripts/validate.sh`, `test-selfies/`, `prompt-results/`, `prompt-results/SCORES.md`
 
 ## Goal
 
@@ -54,7 +54,7 @@ All shot on iPhone, front-facing, neutral background, even lighting. No sunglass
 
 ## Steps
 
-1. Create `~/dev/mane-worker/test-selfies/` and add the 10 input photos as `01.jpg` … `10.jpg`
+1. Create `~/dev/aurax-api/test-selfies/` and add the 10 input photos as `01.jpg` … `10.jpg`
 2. Write `scripts/validate.sh` — bash loop calling Gemini REST API for each (selfie, prompt) pair
 3. Output to `prompt-results/<selfie>_<style>.jpg`
 4. Manually score each of the 50 outputs against the 3 criteria → `prompt-results/SCORES.md`
