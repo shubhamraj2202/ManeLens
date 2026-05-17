@@ -32,7 +32,7 @@ You are building **Hair Lens - AI** — a native iOS app that previews hairstyle
 | Build Number | 1 |
 | Dev Team | 48BYR3J82W |
 | Devices | iPhone + iPad |
-| Worker Repo | `hairlens-worker` (sibling repo) |
+| Worker Repo | `aurax-api` (sibling repo) |
 | Model | Gemini 2.5 Flash Image (Nano Banana) |
 | Pricing assumption | $0.039/image, $0.0195/image batch tier |
 
@@ -100,12 +100,17 @@ User picks photo → FaceValidator.validate()
 | Views/Settings/ | SettingsView.swift | Restore, terms, privacy |
 | Resources/ | StyleCatalog.json | Bundled 30-entry catalog |
 
-### 2. hairlens-worker (separate Cloudflare Worker repo)
+### 2. aurax-api (Cloudflare Worker repo — github.com/shubhamraj2202/aurax-api)
 
-- `src/index.ts` — fetch handler, routes
-- `src/credits.ts` — receipt validation + KV credit ledger
-- `src/prompts.ts` — `STYLE_LIBRARY` + `buildHairPrompt()`
-- `src/gemini.ts` — Nano Banana client
+- `src/index.ts` — router only (POST /hair/generate, /veggie/analyze, /chat)
+- `src/middleware/cors.ts` — CORS headers shared across all routes
+- `src/middleware/ratelimit.ts` — per-device KV rate limiting shared across all routes
+- `src/providers/gemini.ts` — Nano Banana client
+- `src/providers/openrouter.ts` — OpenRouter client stub (multi-model, future)
+- `src/routes/hair/` — Hair Lens generate handler + buildHairPrompt() + STYLE_LIBRARY
+- `src/routes/veggie/` — VeggieLens stub (501)
+- `src/routes/chat/` — Chat stub (501)
+- `src/types.ts` — shared Env, ApiError, GenerateResponse interfaces
 - `wrangler.toml` — KV namespace + secrets bindings (`GEMINI_API_KEY`, `APPLE_SHARED_SECRET`)
 
 ---
