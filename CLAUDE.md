@@ -244,8 +244,8 @@ Plus 3 free credits on first install. Margin math: Standard pack @ $7.99 → ~$6
 
 ## Session Status
 
-**Last Updated:** 2026-05-17
-**Current State:** SESSION 0 PASS — prompt v1 validated 100% across all 3 criteria (50/50 images).
+**Last Updated:** 2026-05-18
+**Current State:** SESSION 0 PASS — prompt v1 validated 100% across all 3 criteria (50/50 images). Docs updated to reflect `aurax-api` backend rename.
 **What's Working:**
 - All 9 screens: Onboarding (3 animated slides), Home (style grid + search + category chips + FAB), Style Detail (hero image + photo upload + collapsible tips + CTA), Custom Prompt (text area + FlowLayout suggestion chips), Generating (orbiting particle animation + rotating tips + progress bar), Result (draggable before/after slider + action bar + feedback), Paywall (3 credit packs + BEST VALUE badge), History (card grid + empty state), Settings (grouped iOS list + toggles + segmented picker)
 - Design system: `DesignSystem.swift` with brand tokens (purple #7C3AED, pink #EC4899), `PrimaryButton`, `CreditPill`, `CategoryChip`, `ScreenNav`
@@ -254,6 +254,9 @@ Plus 3 free credits on first install. Margin math: Standard pack @ $7.99 → ~$6
 - `HairStyle` catalog (6 styles), enum-based navigation state machine
 - Session 0: 50/50 API calls · Identity 100% · Realism 100% · Background 100% · prompt v1 LOCKED
 - Auth: `x-goog-api-key` header · Parsing: `inlineData` (camelCase) + `inline_data` (snake_case)
+- Docs: All references to `mane-worker`/`hairlens-worker` updated to `aurax-api` across README, CLAUDE.md, AGENT.md, SESSION_00_VALIDATION.md
+- App icon: SVG converted to 1024×1024 PNG, set in `AppIcon.appiconset`
+- GitHub remote: connected to `github.com/shubhamraj2202/ManeLens`
 
 **Known Issues:** None blocking. SourceKit cross-file errors resolve at Xcode build time (normal).
 **Next Step:** Session 5 — Cloudflare Worker scaffold (`src/index.ts`, `src/prompts.ts`, `src/gemini.ts`, `wrangler.toml`). Rate limiting + Gemini call only; StoreKit receipt validation deferred to Session 6.
