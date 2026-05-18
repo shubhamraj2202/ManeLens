@@ -23,8 +23,7 @@ enum APIError: Error {
 }
 
 struct APIClient {
-    // Update this URL after deploying the Worker
-    static let workerURL = "https://aurax-api.shubhamraj2202.workers.dev/hair/generate"
+    static let workerURL = "https://aurax-api.auraxai.workers.dev/hair/generate"
 
     static func generate(
         photo: UIImage,
