@@ -13,13 +13,10 @@ struct ResultView: View {
         ZStack(alignment: .bottom) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
-                    // Before/After slider
-                    if let style {
-                        BeforeAfterSlider(
-                            beforeColors: [],
-                            afterStyle: style
-                        )
-                        .padding(.top, 52)
+                    // Before/After slider with real images
+                    if let before = appState.selectedPhoto, let after = appState.generatedImage {
+                        BeforeAfterSlider(before: before, after: after)
+                            .padding(.top, 52)
                     }
 
                     VStack(spacing: 16) {
@@ -47,11 +44,17 @@ struct ResultView: View {
                                 saved.toggle()
                             }
                             Divider().frame(height: 40)
-                            ActionButton(icon: "arrow.down.to.line", label: "Export") {}
+                            ActionButton(icon: "arrow.down.to.line", label: "Export") {
+                                exportImage()
+                            }
                             Divider().frame(height: 40)
-                            ActionButton(icon: "square.and.arrow.up", label: "Share") {}
+                            ActionButton(icon: "square.and.arrow.up", label: "Share") {
+                                shareImage()
+                            }
                             Divider().frame(height: 40)
-                            ActionButton(icon: "arrow.clockwise", label: "Redo") {}
+                            ActionButton(icon: "arrow.clockwise", label: "Redo") {
+                                onTryAnother()
+                            }
                         }
                         .background(Color.black.opacity(0.04))
                         .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
@@ -85,7 +88,7 @@ struct ResultView: View {
                 title: "Your Preview",
                 onBack: onBack,
                 trailing: AnyView(
-                    Button(action: {}) {
+                    Button(action: shareImage) {
                         Image(systemName: "square.and.arrow.up")
                             .font(.system(size: 18))
                             .foregroundStyle(Color.hairText)
@@ -112,6 +115,20 @@ struct ResultView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.hairPurpleLight)
         .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func shareImage() {
+        guard let image = appState.generatedImage else { return }
+        let av = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows.first?.rootViewController?
+            .present(av, animated: true)
+    }
+
+    private func exportImage() {
+        guard let image = appState.generatedImage else { return }
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }
 }
 

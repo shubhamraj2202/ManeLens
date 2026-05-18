@@ -43,6 +43,7 @@ struct ContentView: View {
                     appState: appState,
                     onBack: { navigateBack() },
                     onGenerate: {
+                        guard appState.hasPhoto else { return }
                         if appState.credits > 0 {
                             appState.consumeCredit()
                             navigate(to: .generating(style))
@@ -59,6 +60,7 @@ struct ContentView: View {
                     appState: appState,
                     onBack: { navigateBack() },
                     onGenerate: {
+                        guard appState.hasPhoto else { return }
                         if appState.credits > 0 {
                             appState.consumeCredit()
                             navigate(to: .generating(nil))
@@ -72,13 +74,15 @@ struct ContentView: View {
             case .generating(let style):
                 GeneratingView(
                     styleName: style?.name ?? "Custom Style",
-                    onCancel: { navigateBack() },
-                    onDone: {
-                        if let style { appState.recordGeneration(style: style) }
-                        navigate(to: .result(style))
+                    onCancel: {
+                        appState.refundCredit()
+                        navigateBack()
                     }
                 )
                 .transition(.opacity)
+                .task {
+                    await runGeneration(style: style)
+                }
 
             case .result(let style):
                 ResultView(
@@ -86,7 +90,6 @@ struct ContentView: View {
                     appState: appState,
                     onBack: { navigateBack() },
                     onTryAnother: {
-                        // Clear stack back to home
                         screenStack = []
                         navigate(to: .home)
                     }
@@ -118,9 +121,56 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: screenDescription)
+        .alert("Generation Failed", isPresented: Binding(
+            get: { appState.generationError != nil },
+            set: { if !$0 { appState.generationError = nil } }
+        )) {
+            Button("OK") { appState.generationError = nil }
+        } message: {
+            Text(appState.generationError ?? "")
+        }
     }
 
-    // MARK: Navigation helpers
+    // MARK: - Generation
+
+    @MainActor
+    private func runGeneration(style: HairStyle?) async {
+        guard let photo = appState.selectedPhoto else {
+            navigateBack()
+            return
+        }
+
+        do {
+            let result = try await APIClient.generate(
+                photo: photo,
+                styleKey: style?.styleKey,
+                customPrompt: appState.customPromptText.isEmpty ? nil : appState.customPromptText
+            )
+
+            guard !Task.isCancelled else {
+                appState.refundCredit()
+                return
+            }
+
+            appState.generatedImage = result
+            if let style { appState.recordGeneration(style: style) }
+            navigate(to: .result(style))
+
+        } catch is CancellationError {
+            // onCancel already refunded — nothing to do here
+        } catch let error as APIError {
+            appState.refundCredit()
+            appState.generationError = error.userFacingMessage
+            navigateBack()
+        } catch {
+            appState.refundCredit()
+            appState.generationError = "An unexpected error occurred. Please try again."
+            navigateBack()
+        }
+    }
+
+    // MARK: - Navigation helpers
+
     private func navigate(to newScreen: Screen) {
         screenStack.append(screen)
         withAnimation { screen = newScreen }
@@ -131,18 +181,17 @@ struct ContentView: View {
         withAnimation { screen = previous }
     }
 
-    // Used as animation value identity
     private var screenDescription: String {
         switch screen {
-        case .onboarding:       return "onboarding"
-        case .home:             return "home"
-        case .styleDetail(let s): return "detail-\(s.id)"
-        case .customPrompt:     return "custom"
-        case .generating:       return "generating"
-        case .result:           return "result"
-        case .history:          return "history"
-        case .paywall:          return "paywall"
-        case .settings:         return "settings"
+        case .onboarding:           return "onboarding"
+        case .home:                 return "home"
+        case .styleDetail(let s):   return "detail-\(s.id)"
+        case .customPrompt:         return "custom"
+        case .generating:           return "generating"
+        case .result:               return "result"
+        case .history:              return "history"
+        case .paywall:              return "paywall"
+        case .settings:             return "settings"
         }
     }
 }

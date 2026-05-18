@@ -1,85 +1,35 @@
 import SwiftUI
-
-private struct RecentPhoto: Identifiable {
-    let id: String
-    let label: String
-    let hairColor: Color
-    let bgColors: [Color]
-}
-
-private let recentPhotos: [RecentPhoto] = [
-    RecentPhoto(id: "p1", label: "Today",
-                hairColor: Color(red: 0.24, green: 0.17, blue: 0.12),
-                bgColors: [Color(red: 0.10, green: 0.08, blue: 0.06)]),
-    RecentPhoto(id: "p2", label: "2 days ago",
-                hairColor: Color(red: 0.10, green: 0.10, blue: 0.16),
-                bgColors: [Color(red: 0.06, green: 0.06, blue: 0.09)]),
-    RecentPhoto(id: "p3", label: "Last week",
-                hairColor: Color(red: 0.29, green: 0.21, blue: 0.14),
-                bgColors: [Color(red: 0.12, green: 0.09, blue: 0.07)]),
-    RecentPhoto(id: "p4", label: "Mar 12",
-                hairColor: Color(red: 0.18, green: 0.11, blue: 0.07),
-                bgColors: [Color(red: 0.09, green: 0.06, blue: 0.03)]),
-    RecentPhoto(id: "p5", label: "Feb 28",
-                hairColor: Color(red: 0.36, green: 0.23, blue: 0.13),
-                bgColors: [Color(red: 0.16, green: 0.10, blue: 0.06)]),
-]
+import PhotosUI
 
 struct PhotoPickerSheet: View {
     @Binding var isPresented: Bool
-    let onSelect: () -> Void
+    let onSelect: (UIImage) -> Void
+
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var showCamera = false
 
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Recent photos section
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Text("RECENT PHOTOS")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(Color.hairTextSec)
-                                .kerning(0.6)
-                            Spacer()
-                            Button("See All") {}
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(Color.hairPurple)
-                        }
-
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 10) {
-                                ForEach(recentPhotos) { photo in
-                                    Button(action: { onSelect(); isPresented = false }) {
-                                        VStack(alignment: .leading, spacing: 5) {
-                                            HairFaceView(
-                                                hairColor: photo.hairColor,
-                                                bgColors: photo.bgColors
-                                            )
-                                            .frame(width: 88, height: 110)
-                                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                                            .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
-
-                                            Text(photo.label)
-                                                .font(.system(size: 11))
-                                                .foregroundStyle(Color.hairTextSec)
-                                                .lineLimit(1)
-                                        }
-                                    }
-                                    .frame(width: 88)
-                                }
-                            }
-                        }
+                VStack(spacing: 8) {
+                    PhotosPicker(selection: $selectedItem, matching: .images) {
+                        SourceRow(
+                            icon: "photo.on.rectangle",
+                            title: "Choose from Library",
+                            subtitle: "Pick from Photos"
+                        )
                     }
-                    .padding(.horizontal)
+                    .buttonStyle(.plain)
 
-                    // Source options
-                    VStack(spacing: 8) {
-                        SourceRow(icon: "camera.fill",         title: "Take Photo",          subtitle: "Use your camera",        action: { onSelect(); isPresented = false })
-                        SourceRow(icon: "photo.on.rectangle",  title: "Choose from Library", subtitle: "Pick from Photos",       action: { onSelect(); isPresented = false })
-                        SourceRow(icon: "folder.fill",         title: "Browse Files",        subtitle: "Import from Files app",  action: { onSelect(); isPresented = false })
+                    SourceRow(
+                        icon: "camera.fill",
+                        title: "Take Photo",
+                        subtitle: "Use your camera"
+                    ) {
+                        showCamera = true
                     }
-                    .padding(.horizontal)
                 }
+                .padding(.horizontal)
                 .padding(.top, 8)
                 .padding(.bottom, 30)
             }
@@ -93,8 +43,54 @@ struct PhotoPickerSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
+        .onChange(of: selectedItem) { _, item in
+            guard let item else { return }
+            Task {
+                if let data = try? await item.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    await MainActor.run {
+                        onSelect(image)
+                        isPresented = false
+                    }
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showCamera) {
+            CameraPickerView { image in
+                onSelect(image)
+                showCamera = false
+                isPresented = false
+            }
+            .ignoresSafeArea()
+        }
+    }
+}
+
+private struct CameraPickerView: UIViewControllerRepresentable {
+    let onCapture: (UIImage) -> Void
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.cameraDevice = .front
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator { Coordinator(onCapture: onCapture) }
+
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let onCapture: (UIImage) -> Void
+        init(onCapture: @escaping (UIImage) -> Void) { self.onCapture = onCapture }
+
+        func imagePickerController(_ picker: UIImagePickerController,
+                                   didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            if let image = info[.originalImage] as? UIImage { onCapture(image) }
+        }
     }
 }
 
@@ -102,39 +98,44 @@ private struct SourceRow: View {
     let icon: String
     let title: String
     let subtitle: String
-    let action: () -> Void
+    var action: (() -> Void)? = nil
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.hairPurpleAlpha)
-                        .frame(width: 42, height: 42)
-                    Image(systemName: icon)
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color.hairPurple)
-                }
+        let content = HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.hairPurpleAlpha)
+                    .frame(width: 42, height: 42)
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundStyle(Color.hairPurple)
+            }
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Color.hairText)
-                    Text(subtitle)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.hairTextSec)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.hairText)
+                Text(subtitle)
+                    .font(.system(size: 12))
                     .foregroundStyle(Color.hairTextSec)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.hairTextSec)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+
+        if let action {
+            Button(action: action) { content }
+                .buttonStyle(.plain)
+        } else {
+            content
         }
     }
 }

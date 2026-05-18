@@ -3,7 +3,6 @@ import SwiftUI
 struct GeneratingView: View {
     let styleName: String
     var onCancel: () -> Void
-    var onDone: () -> Void
 
     @State private var rotation: Double = 0
     @State private var pulse: Bool = false
@@ -77,7 +76,7 @@ struct GeneratingView: View {
                 }
                 .multilineTextAlignment(.center)
 
-                // Progress bar
+                // Progress bar — fills to 90% over 12 s, then holds until API responds
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         Capsule()
@@ -107,34 +106,25 @@ struct GeneratingView: View {
     }
 
     private func startAnimations() {
-        // Rotation
         withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: false)) {
             rotation = 360
         }
 
-        // Pulse
         withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
             pulse = true
         }
 
-        // Tip rotation
-        Timer.scheduledTimer(withTimeInterval: 2.8, repeats: true) { timer in
+        Timer.scheduledTimer(withTimeInterval: 2.8, repeats: true) { _ in
             withAnimation { tipIndex = (tipIndex + 1) % tips.count }
         }
 
-        // Progress + auto-complete
+        // Progress fills to 90% over 12 s, then holds — ContentView's .task drives actual navigation
         let startTime = Date()
-        let duration: Double = 3.8
         Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
             let elapsed = Date().timeIntervalSince(startTime)
-            let p = min(1.0, elapsed / duration)
+            let p = min(0.9, elapsed / 12.0)
             progress = p
-            if p >= 1.0 {
-                timer.invalidate()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    onDone()
-                }
-            }
+            if p >= 0.9 { timer.invalidate() }
         }
     }
 }

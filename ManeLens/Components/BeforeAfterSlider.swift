@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct BeforeAfterSlider: View {
-    let beforeColors: [Color]
-    let afterStyle: HairStyle
+    let before: UIImage
+    let after: UIImage
 
     @State private var sliderPosition: CGFloat = 0.48
 
@@ -10,21 +10,23 @@ struct BeforeAfterSlider: View {
         GeometryReader { geo in
             let w = geo.size.width
             ZStack {
-                // Before (left)
-                HairFaceView(
-                    hairColor: Color(red: 0.18, green: 0.18, blue: 0.25),
-                    bgColors: [Color(red: 0.10, green: 0.10, blue: 0.16), Color(red: 0.16, green: 0.15, blue: 0.25)]
-                )
+                // Before (full width, underneath)
+                Image(uiImage: before)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: w)
+                    .clipped()
 
-                // After (right, clipped)
-                HairFaceView(
-                    hairColor: afterStyle.hairColor,
-                    bgColors: afterStyle.gradientColors
-                )
-                .clipShape(
-                    Rectangle()
-                        .offset(x: w * sliderPosition)
-                )
+                // After (clipped to right of divider)
+                Image(uiImage: after)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: w)
+                    .clipped()
+                    .clipShape(
+                        Rectangle()
+                            .offset(x: w * sliderPosition)
+                    )
 
                 // Labels
                 VStack {

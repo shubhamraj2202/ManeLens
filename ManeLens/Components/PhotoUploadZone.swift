@@ -1,22 +1,20 @@
 import SwiftUI
 
 struct PhotoUploadZone: View {
-    let filled: Bool
+    let photo: UIImage?
     let hairColor: Color
     let onTap: () -> Void
     let onRemove: () -> Void
 
     var body: some View {
         ZStack {
-            if filled {
-                // Show the face illustration as if a photo was selected
-                HairFaceView(
-                    hairColor: hairColor,
-                    bgColors: [Color(red: 0.133, green: 0.133, blue: 0.133), Color(red: 0.067, green: 0.067, blue: 0.067)]
-                )
-                .frame(height: 180)
+            if let photo {
+                Image(uiImage: photo)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 180)
+                    .clipped()
 
-                // Remove button
                 VStack {
                     HStack {
                         Spacer()
@@ -33,7 +31,6 @@ struct PhotoUploadZone: View {
                     Spacer()
                 }
             } else {
-                // Empty state
                 VStack(spacing: 10) {
                     ZStack {
                         Circle()
@@ -58,12 +55,12 @@ struct PhotoUploadZone: View {
                 .onTapGesture(perform: onTap)
             }
         }
-        .background(filled ? Color.clear : Color.hairPurpleLight)
+        .background(photo == nil ? Color.hairPurpleLight : Color.clear)
         .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
         .overlay(
             RoundedRectangle(cornerRadius: DS.radiusCard)
                 .strokeBorder(
-                    filled ? Color.clear : Color.hairPurple.opacity(0.3),
+                    photo == nil ? Color.hairPurple.opacity(0.3) : Color.clear,
                     style: StrokeStyle(lineWidth: 2, dash: [6, 4])
                 )
         )

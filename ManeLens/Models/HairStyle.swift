@@ -7,6 +7,7 @@ struct HairStyle: Identifiable, Hashable {
     let hairColor: Color
     let gradientColors: [Color]
     let description: String
+    let styleKey: String
     var isNew: Bool = false
 
     static func == (lhs: HairStyle, rhs: HairStyle) -> Bool { lhs.id == rhs.id }
@@ -24,7 +25,8 @@ extension HairStyle {
                 Color(red: 0.176, green: 0.082, blue: 0.412),
                 Color(red: 0.298, green: 0.157, blue: 0.596),
             ],
-            description: "A timeless, structured cut that blends clean sides with a polished top — perfect for the big day."
+            description: "A timeless, structured cut that blends clean sides with a polished top — perfect for the big day.",
+            styleKey: "indian_groom_slick"
         ),
         HairStyle(
             id: 2, name: "Korean Wolf Cut", category: "Salon",
@@ -35,6 +37,7 @@ extension HairStyle {
                 Color(red: 0.690, green: 0.408, blue: 0.145),
             ],
             description: "A trendy layered cut with face-framing texture and shaggy ends, popularized by K-pop idols.",
+            styleKey: "wolf_cut",
             isNew: true
         ),
         HairStyle(
@@ -45,7 +48,8 @@ extension HairStyle {
                 Color(red: 0.361, green: 0.063, blue: 0.063),
                 Color(red: 0.612, green: 0.125, blue: 0.125),
             ],
-            description: "An elaborate swept-up style adorned with layers and volume, ideal for traditional ceremonies."
+            description: "An elaborate swept-up style adorned with layers and volume, ideal for traditional ceremonies.",
+            styleKey: "indian_wedding_updo"
         ),
         HairStyle(
             id: 4, name: "French Crop Fade", category: "Casual",
@@ -55,7 +59,8 @@ extension HairStyle {
                 Color(red: 0.078, green: 0.078, blue: 0.165),
                 Color(red: 0.157, green: 0.157, blue: 0.282),
             ],
-            description: "Short, clean and sharp — a low-maintenance crop with a high-contrast fade that suits any occasion."
+            description: "Short, clean and sharp — a low-maintenance crop with a high-contrast fade that suits any occasion.",
+            styleKey: "french_crop_fade"
         ),
         HairStyle(
             id: 5, name: "Beach Waves", category: "Bold",
@@ -65,7 +70,8 @@ extension HairStyle {
                 Color(red: 0.478, green: 0.310, blue: 0.102),
                 Color(red: 0.769, green: 0.533, blue: 0.220),
             ],
-            description: "Effortless, sun-kissed waves with natural texture and movement for a carefree, confident look."
+            description: "Effortless, sun-kissed waves with natural texture and movement for a carefree, confident look.",
+            styleKey: "beach_blonde_waves"
         ),
         HairStyle(
             id: 6, name: "Curtain Bangs", category: "Salon",
@@ -75,7 +81,8 @@ extension HairStyle {
                 Color(red: 0.290, green: 0.141, blue: 0.082),
                 Color(red: 0.541, green: 0.333, blue: 0.208),
             ],
-            description: "Soft, face-framing bangs that split naturally at the center, giving a relaxed, editorial feel."
+            description: "Soft, face-framing bangs that split naturally at the center, giving a relaxed, editorial feel.",
+            styleKey: "curtain_bangs"
         ),
     ]
 

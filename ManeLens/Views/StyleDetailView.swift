@@ -44,10 +44,10 @@ struct StyleDetailView: View {
                                 .foregroundStyle(Color.hairText)
 
                             PhotoUploadZone(
-                                filled: appState.hasPhoto,
+                                photo: appState.selectedPhoto,
                                 hairColor: style.hairColor,
                                 onTap: { showPicker = true },
-                                onRemove: { appState.hasPhoto = false }
+                                onRemove: { appState.selectedPhoto = nil }
                             )
                         }
 
@@ -72,8 +72,8 @@ struct StyleDetailView: View {
             navBar
         }
         .sheet(isPresented: $showPicker) {
-            PhotoPickerSheet(isPresented: $showPicker) {
-                appState.hasPhoto = true
+            PhotoPickerSheet(isPresented: $showPicker) { image in
+                appState.selectedPhoto = image
             }
         }
     }
@@ -134,9 +134,17 @@ struct StyleDetailView: View {
 
     private var bottomCTA: some View {
         VStack(spacing: 6) {
-            PrimaryButton(title: "Generate Preview", icon: "✨", variant: .primary, action: onGenerate)
+            PrimaryButton(
+                title: "Generate Preview",
+                icon: "✨",
+                variant: .primary,
+                disabled: !appState.hasPhoto,
+                action: onGenerate
+            )
 
-            Text("Uses 1 credit · You have \(appState.credits) remaining")
+            Text(appState.hasPhoto
+                 ? "Uses 1 credit · You have \(appState.credits) remaining"
+                 : "Upload a photo to continue")
                 .font(.system(size: 12))
                 .foregroundStyle(Color.hairTextSec)
 

@@ -5,7 +5,6 @@ struct CustomPromptView: View {
     var onBack: () -> Void
     var onGenerate: () -> Void
 
-    @State private var promptText = ""
     @State private var showPicker = false
 
     private let chips = ["Long & wavy", "Short & textured", "Bold color", "Vintage", "Editorial", "Curly"]
@@ -25,21 +24,21 @@ struct CustomPromptView: View {
                             .foregroundStyle(Color.hairTextSec)
                     }
 
-                    // Text area
+                    // Text area — bound directly to appState so ContentView can read it
                     ZStack(alignment: .bottomTrailing) {
-                        TextEditor(text: $promptText)
+                        TextEditor(text: $appState.customPromptText)
                             .font(.system(size: 15))
                             .foregroundStyle(Color.hairText)
                             .scrollContentBackground(.hidden)
                             .frame(minHeight: 120)
                             .padding(14)
-                            .onChange(of: promptText) { _, new in
+                            .onChange(of: appState.customPromptText) { _, new in
                                 if new.count > maxLength {
-                                    promptText = String(new.prefix(maxLength))
+                                    appState.customPromptText = String(new.prefix(maxLength))
                                 }
                             }
 
-                        if promptText.isEmpty {
+                        if appState.customPromptText.isEmpty {
                             Text("e.g., Long wavy beach blonde hair with side bangs, K-pop inspired…")
                                 .font(.system(size: 15))
                                 .foregroundStyle(Color.hairTextSec.opacity(0.6))
@@ -48,7 +47,7 @@ struct CustomPromptView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
 
-                        Text("\(promptText.count)/\(maxLength)")
+                        Text("\(appState.customPromptText.count)/\(maxLength)")
                             .font(.system(size: 12))
                             .foregroundStyle(Color.hairTextSec)
                             .padding(10)
@@ -64,8 +63,10 @@ struct CustomPromptView: View {
                     FlowLayout(spacing: 8) {
                         ForEach(chips, id: \.self) { chip in
                             Button(action: {
-                                let addition = promptText.isEmpty ? chip.lowercased() : ", \(chip.lowercased())"
-                                promptText += addition
+                                let addition = appState.customPromptText.isEmpty
+                                    ? chip.lowercased()
+                                    : ", \(chip.lowercased())"
+                                appState.customPromptText += addition
                             }) {
                                 Text(chip)
                                     .font(.system(size: 13, weight: .medium))
@@ -88,10 +89,10 @@ struct CustomPromptView: View {
                             .foregroundStyle(Color.hairText)
 
                         PhotoUploadZone(
-                            filled: appState.hasPhoto,
+                            photo: appState.selectedPhoto,
                             hairColor: Color(red: 0.29, green: 0.18, blue: 0.11),
                             onTap: { showPicker = true },
-                            onRemove: { appState.hasPhoto = false }
+                            onRemove: { appState.selectedPhoto = nil }
                         )
                     }
 
@@ -106,11 +107,13 @@ struct CustomPromptView: View {
                 PrimaryButton(
                     title: "Generate Preview",
                     icon: "✨",
-                    variant: promptText.trimmingCharacters(in: .whitespaces).isEmpty ? .primary : .gradient,
-                    disabled: promptText.trimmingCharacters(in: .whitespaces).isEmpty,
+                    variant: appState.customPromptText.trimmingCharacters(in: .whitespaces).isEmpty ? .primary : .gradient,
+                    disabled: appState.customPromptText.trimmingCharacters(in: .whitespaces).isEmpty || !appState.hasPhoto,
                     action: onGenerate
                 )
-                Text("Uses 1 credit · You have \(appState.credits) remaining")
+                Text(appState.hasPhoto
+                     ? "Uses 1 credit · You have \(appState.credits) remaining"
+                     : "Upload a photo to continue")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.hairTextSec)
             }
@@ -139,8 +142,8 @@ struct CustomPromptView: View {
             .background(.ultraThinMaterial)
         }
         .sheet(isPresented: $showPicker) {
-            PhotoPickerSheet(isPresented: $showPicker) {
-                appState.hasPhoto = true
+            PhotoPickerSheet(isPresented: $showPicker) { image in
+                appState.selectedPhoto = image
             }
         }
     }
