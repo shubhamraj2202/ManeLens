@@ -245,23 +245,26 @@ Plus 3 free credits on first install. Margin math: Standard pack @ $7.99 → ~$6
 ## Session Status
 
 **Last Updated:** 2026-05-19
-**Current State:** SESSION 6 COMPLETE — iOS fully wired to live Cloudflare Worker. End-to-end pipeline ready to test on device.
+**Current State:** SESSION 7 COMPLETE — StoreKit 2 wired, all known bugs fixed, Worker credit ledger live.
 **What's Working:**
 - Full generate pipeline: photo pick → face validate → compress → POST Worker → before/after slider result
-- `Services/APIClient.swift` — `https://aurax-api.auraxai.workers.dev/hair/generate`
-- `Services/FaceValidator.swift` — Vision: 1 face, ≥8% area, eyes visible, yaw/pitch ≤25°
-- `Services/ImageProcessor.swift` — 1024px long edge, JPEG q=0.8, base64
-- `PhotoPickerSheet` — real PhotosUI.PhotosPicker + front camera UIImagePickerController
-- `PhotoUploadZone` — shows actual selected photo thumbnail
-- `BeforeAfterSlider` — real UIImage before/after comparison
-- `ResultView` — Share (UIActivityViewController) + Export (save to Photos)
-- `ContentView` — async `.task` drives generation; refund credit on cancel/error; error alert
-- Generate button disabled until photo uploaded
-- Cloudflare Worker: staging + production live, `gemini_ping: pong` confirmed
-- KV rate limiting: 100 req/device/day, subdomain `auraxai.workers.dev`
+- `Services/CreditManager.swift` — @MainActor @Observable; StoreKit 2 load/purchase/restore; credits in UserDefaults (`hairlens_credits_v1`); 3 free on first install; notifies Worker `/credits/purchase` on purchase
+- `Services/APIClient.swift` — handles 402 `payment_required` → `.paymentRequired`; ContentView routes to Paywall
+- `AppState.swift` — credits delegated to CreditManager; no more in-memory reset on launch
+- **BUG FIXED**: Onboarding no longer repeats — `hairlens_has_seen_onboarding` UserDefaults flag; `ContentView.initialScreen()` reads at launch
+- **BUG FIXED**: Credits persist across launches — UserDefaults via CreditManager
+- **BUG FIXED**: Export no longer crashes — `PHPhotoLibrary.requestAddOnlyAuthorization` + `NSPhotoLibraryAddUsageDescription` in pbxproj; toast shows result
+- **BUG FIXED**: Camera permission string — `NSCameraUsageDescription` added to pbxproj
+- `PaywallView.swift` — real StoreKit products; localized `product.displayPrice`; purchase + restore wired
+- `SettingsView.swift` — Restore Purchases button live with error alert
+- Worker `POST /credits/purchase` — JWS decode, idempotency via `tx:{transactionId}`, adds to `credits:{deviceId}`
+- Worker `GET /credits/balance` — returns server-side balance
+- Worker `POST /hair/generate` — credit check (402 if balance=0 after first purchase), deducts 1, returns real `creditsRemaining`
+- Both envs deployed 2026-05-19
 
 **Known Issues:** SourceKit cross-file errors resolve at Xcode build time (PBXFileSystemSynchronizedRootGroup — normal).
-**Next Step:** Session 7 — StoreKit 2 CreditManager (`credits_10`, `credits_30`, `credits_100`) + PaywallView wiring + Worker receipt validation (`src/credits.ts`) + `APPLE_SHARED_SECRET`.
+**StoreKit prerequisite:** Create `credits_10`, `credits_30`, `credits_100` as Consumable IAPs in App Store Connect before purchase flow works on device. Use a sandbox tester account.
+**Next Step:** Session 8 — App Store Connect IAP setup + sandbox testing + TestFlight build + App Store screenshots.
 
 ---
 

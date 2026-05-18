@@ -1,16 +1,14 @@
 import SwiftUI
+import StoreKit
 
 struct PaywallView: View {
     @Bindable var appState: AppState
     var onClose: () -> Void
 
-    @State private var selectedPack = 1
+    @State private var selectedProduct: Product? = nil
+    @State private var isLoading = false
 
-    private let packs: [(id: Int, credits: Int, price: String, usd: String, label: String, desc: String, badge: String?)] = [
-        (0, 10,  "₹199",   "$2.99",  "Starter",  "Try a few styles",       nil),
-        (1, 30,  "₹499",   "$7.99",  "Standard", "Best value — save 16%",  "BEST VALUE"),
-        (2, 100, "₹1,499", "$19.99", "Pro Pack",  "For serious style hunters", nil),
-    ]
+    private var creditManager: CreditManager { appState.creditManager }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -33,13 +31,18 @@ struct PaywallView: View {
                     .padding(.top, 20)
 
                     // Pack cards
-                    VStack(spacing: 12) {
-                        ForEach(packs, id: \.id) { pack in
-                            PackCard(
-                                pack: pack,
-                                selected: selectedPack == pack.id,
-                                onTap: { selectedPack = pack.id }
-                            )
+                    if creditManager.products.isEmpty {
+                        ProgressView()
+                            .padding(.vertical, 40)
+                    } else {
+                        VStack(spacing: 12) {
+                            ForEach(creditManager.products, id: \.id) { product in
+                                PackCard(
+                                    product: product,
+                                    selected: selectedProduct?.id == product.id,
+                                    onTap: { selectedProduct = product }
+                                )
+                            }
                         }
                     }
 
@@ -51,18 +54,27 @@ struct PaywallView: View {
             // Bottom CTA
             VStack(spacing: 14) {
                 PrimaryButton(
-                    title: "Continue with \(packs[selectedPack].label) — \(packs[selectedPack].price)",
+                    title: ctaTitle,
                     variant: .gradient
                 ) {
-                    let credits = packs[selectedPack].credits
-                    appState.addCredits(credits)
-                    onClose()
+                    guard let product = selectedProduct, !creditManager.isPurchasing else { return }
+                    isLoading = true
+                    Task {
+                        await creditManager.purchase(product)
+                        isLoading = false
+                        onClose()
+                    }
                 }
+                .opacity(selectedProduct == nil || creditManager.isPurchasing ? 0.6 : 1)
 
                 HStack(spacing: 20) {
-                    Button("Restore Purchase") {}
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.hairTextSec)
+                    Button {
+                        Task { await creditManager.restore() }
+                    } label: {
+                        Text("Restore Purchase")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.hairTextSec)
+                    }
 
                     Button("Privacy Policy") {}
                         .font(.system(size: 12))
@@ -91,37 +103,49 @@ struct PaywallView: View {
             .padding(.top, 16)
             .padding(.trailing, DS.paddingPage)
         }
+        .task {
+            await creditManager.loadProducts()
+            if selectedProduct == nil {
+                selectedProduct = creditManager.products.first(where: { $0.id == "credits_30" })
+                             ?? creditManager.products.first
+            }
+        }
+    }
+
+    private var ctaTitle: String {
+        guard let product = selectedProduct else { return "Select a pack" }
+        let credits = CreditManager.creditsLabel(for: product.id)
+        return "Continue · \(credits) credits — \(product.displayPrice)"
     }
 }
 
 private struct PackCard: View {
-    let pack: (id: Int, credits: Int, price: String, usd: String, label: String, desc: String, badge: String?)
+    let product: Product
     let selected: Bool
     let onTap: () -> Void
+
+    private var credits: Int   { CreditManager.creditsLabel(for: product.id) }
+    private var desc: String   { CreditManager.descriptionLabel(for: product.id) }
+    private var badge: String? { CreditManager.badge(for: product.id) }
 
     var body: some View {
         Button(action: onTap) {
             ZStack(alignment: .topTrailing) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("\(pack.label) · \(pack.credits) credits")
+                        Text("\(product.displayName.isEmpty ? packName : product.displayName) · \(credits) credits")
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.hairText)
-                        Text(pack.desc)
+                        Text(desc)
                             .font(.system(size: 13))
                             .foregroundStyle(Color.hairTextSec)
                     }
 
                     Spacer()
 
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(pack.price)
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(selected ? Color.hairPurple : Color.hairText)
-                        Text(pack.usd)
-                            .font(.system(size: 11))
-                            .foregroundStyle(Color.hairTextSec)
-                    }
+                    Text(product.displayPrice)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(selected ? Color.hairPurple : Color.hairText)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
@@ -132,8 +156,7 @@ private struct PackCard: View {
                         .stroke(selected ? Color.hairPurple : Color.black.opacity(0.08), lineWidth: selected ? 2 : 1)
                 )
 
-                // Badge
-                if let badge = pack.badge {
+                if let badge {
                     Text(badge)
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(.white)
@@ -147,5 +170,14 @@ private struct PackCard: View {
             }
         }
         .animation(.spring(response: 0.25, dampingFraction: 0.8), value: selected)
+    }
+
+    private var packName: String {
+        switch product.id {
+        case "credits_10":  return "Starter"
+        case "credits_30":  return "Standard"
+        case "credits_100": return "Pro Pack"
+        default: return product.id
+        }
     }
 }

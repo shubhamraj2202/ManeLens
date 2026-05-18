@@ -28,7 +28,21 @@ struct SettingsView: View {
                             }
                         ))
                         Divider().padding(.leading, 16)
-                        SettingsRow(label: "Restore Purchases", hasChevron: false, trailing: AnyView(chevron))
+                        Button {
+                            Task { await appState.creditManager.restore() }
+                        } label: {
+                            SettingsRow(label: "Restore Purchases", hasChevron: false, trailing: AnyView(chevron))
+                        }
+                        .buttonStyle(.plain)
+                        .alert("Restore Failed",
+                               isPresented: Binding(
+                                get: { appState.creditManager.restoreError != nil },
+                                set: { if !$0 { appState.creditManager.restoreError = nil } }
+                               )) {
+                            Button("OK") { appState.creditManager.restoreError = nil }
+                        } message: {
+                            Text(appState.creditManager.restoreError ?? "")
+                        }
                     }
 
                     // Preferences

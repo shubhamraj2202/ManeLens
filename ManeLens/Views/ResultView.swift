@@ -1,4 +1,5 @@
 import SwiftUI
+import Photos
 
 struct ResultView: View {
     let style: HairStyle?
@@ -8,6 +9,7 @@ struct ResultView: View {
 
     @State private var liked: Bool? = nil
     @State private var saved = false
+    @State private var exportMessage: String? = nil
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -83,6 +85,25 @@ struct ResultView: View {
         }
         .background(Color.hairBg)
         .navigationBarHidden(true)
+        .overlay(alignment: .bottom) {
+            if let msg = exportMessage {
+                Text(msg)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color.black.opacity(0.75))
+                    .clipShape(Capsule())
+                    .padding(.bottom, 120)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                            withAnimation { exportMessage = nil }
+                        }
+                    }
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: exportMessage)
         .overlay(alignment: .top) {
             ScreenNav(
                 title: "Your Preview",
@@ -128,7 +149,17 @@ struct ResultView: View {
 
     private func exportImage() {
         guard let image = appState.generatedImage else { return }
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        PHPhotoLibrary.requestAddOnlyAuthorization { status in
+            DispatchQueue.main.async {
+                switch status {
+                case .authorized, .limited:
+                    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                    exportMessage = "Saved to Photos"
+                default:
+                    exportMessage = "Allow Photos access in Settings to save images"
+                }
+            }
+        }
     }
 }
 

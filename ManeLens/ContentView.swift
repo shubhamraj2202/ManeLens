@@ -14,14 +14,19 @@ enum Screen {
 
 struct ContentView: View {
     @State private var appState = AppState()
-    @State private var screen: Screen = .onboarding
+    @State private var screen: Screen = ContentView.initialScreen()
     @State private var screenStack: [Screen] = []
+
+    private static func initialScreen() -> Screen {
+        UserDefaults.standard.bool(forKey: "hairlens_has_seen_onboarding") ? .home : .onboarding
+    }
 
     var body: some View {
         ZStack {
             switch screen {
             case .onboarding:
                 OnboardingView {
+                    UserDefaults.standard.set(true, forKey: "hairlens_has_seen_onboarding")
                     navigate(to: .home)
                 }
                 .transition(.opacity)
@@ -160,8 +165,13 @@ struct ContentView: View {
             // onCancel already refunded — nothing to do here
         } catch let error as APIError {
             appState.refundCredit()
-            appState.generationError = error.userFacingMessage
-            navigateBack()
+            if case .paymentRequired = error {
+                navigateBack()
+                navigate(to: .paywall)
+            } else {
+                appState.generationError = error.userFacingMessage
+                navigateBack()
+            }
         } catch {
             appState.refundCredit()
             appState.generationError = "An unexpected error occurred. Please try again."

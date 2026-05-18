@@ -10,20 +10,19 @@ struct GenerationRecord: Identifiable {
 
 @Observable
 class AppState {
-    var credits: Int = 3
+    let creditManager = CreditManager()
+
     var selectedPhoto: UIImage? = nil
     var generatedImage: UIImage? = nil
     var customPromptText: String = ""
     var generationError: String? = nil
-    var showOnboarding: Bool = true
     var history: [GenerationRecord] = []
-    var selectedStyle: HairStyle? = nil
 
+    var credits: Int { creditManager.credits }
     var hasPhoto: Bool { selectedPhoto != nil }
 
-    func consumeCredit() { if credits > 0 { credits -= 1 } }
-    func refundCredit() { credits += 1 }
-    func addCredits(_ n: Int) { credits += n }
+    func consumeCredit() { creditManager.consume() }
+    func refundCredit()  { creditManager.refund() }
 
     func recordGeneration(style: HairStyle) {
         history.insert(GenerationRecord(style: style), at: 0)

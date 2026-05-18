@@ -6,6 +6,7 @@ enum APIError: Error {
     case network(Error)
     case styleBlocked
     case rateLimited
+    case paymentRequired
     case generationFailed(String)
     case noImage
 
@@ -16,6 +17,7 @@ enum APIError: Error {
         case .network:                   return "Network error. Check your connection and try again."
         case .styleBlocked:              return "This style was flagged. Please try a different style."
         case .rateLimited:               return "Daily limit reached. Try again tomorrow."
+        case .paymentRequired:           return "No credits remaining. Please purchase more credits."
         case .generationFailed(let msg): return "Generation failed: \(msg)"
         case .noImage:                   return "No image returned. Please try again."
         }
@@ -69,8 +71,9 @@ struct APIClient {
 
         if let errorCode = json["error"] as? String {
             switch errorCode {
-            case "style_blocked": throw APIError.styleBlocked
-            case "rate_limited":  throw APIError.rateLimited
+            case "style_blocked":      throw APIError.styleBlocked
+            case "rate_limited":       throw APIError.rateLimited
+            case "payment_required":   throw APIError.paymentRequired
             default:
                 let msg = json["message"] as? String ?? errorCode
                 throw APIError.generationFailed(msg)
