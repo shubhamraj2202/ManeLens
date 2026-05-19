@@ -105,7 +105,11 @@ struct ContentView: View {
                 HistoryView(
                     appState: appState,
                     onBack: { navigateBack() },
-                    onItemSelect: { record in navigate(to: .result(record.style)) }
+                    onItemSelect: { record in
+                        appState.selectedPhoto = record.originalImage
+                        appState.generatedImage = record.resultImage
+                        navigate(to: .result(record.style))
+                    }
                 )
                 .transition(.move(edge: .trailing))
 
@@ -158,7 +162,7 @@ struct ContentView: View {
             }
 
             appState.generatedImage = result
-            if let style { appState.recordGeneration(style: style) }
+            if let style { appState.recordGeneration(style: style, original: photo, result: result) }
             navigate(to: .result(style))
 
         } catch is CancellationError {

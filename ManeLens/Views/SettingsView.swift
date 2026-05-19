@@ -1,13 +1,16 @@
 import SwiftUI
+import StoreKit
 
 struct SettingsView: View {
     @Bindable var appState: AppState
     var onBack: () -> Void
     var onGetMore: () -> Void
 
+    @State private var appearance = "System"
     @State private var saveToPhotos = true
     @State private var hapticFeedback = true
-    @State private var appearance = "System"
+    @State private var showClearHistoryAlert = false
+    @State private var showDeleteDataAlert = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -70,42 +73,84 @@ struct SettingsView: View {
 
                     // About
                     SettingsSection(title: "About") {
-                        ForEach([
-                            ("star.fill",     "Rate Hair Lens - AI"),
-                            ("square.and.arrow.up", "Share App"),
-                            ("questionmark.circle", "Help & FAQ"),
-                            ("envelope",      "Contact Support"),
-                        ], id: \.1) { (icon, label) in
-                            SettingsRow(
-                                icon: icon,
-                                label: label,
-                                trailing: AnyView(chevron)
-                            )
-                            if label != "Contact Support" {
-                                Divider().padding(.leading, 16)
-                            }
+                        Button { rateApp() } label: {
+                            SettingsRow(icon: "star.fill", label: "Rate Hair Lens - AI", trailing: AnyView(chevron))
                         }
+                        .buttonStyle(.plain)
+
+                        Divider().padding(.leading, 16)
+
+                        Button { shareApp() } label: {
+                            SettingsRow(icon: "square.and.arrow.up", label: "Share App", trailing: AnyView(chevron))
+                        }
+                        .buttonStyle(.plain)
+
+                        Divider().padding(.leading, 16)
+
+                        Button { openURL("mailto:shubhamraj2202@gmail.com") } label: {
+                            SettingsRow(icon: "questionmark.circle", label: "Help & FAQ", trailing: AnyView(chevron))
+                        }
+                        .buttonStyle(.plain)
+
+                        Divider().padding(.leading, 16)
+
+                        Button { openURL("mailto:shubhamraj2202@gmail.com") } label: {
+                            SettingsRow(icon: "envelope", label: "Contact Support", trailing: AnyView(chevron))
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     // Legal
                     SettingsSection(title: "Legal") {
-                        ForEach(["Privacy Policy", "Terms of Service", "Acknowledgments"], id: \.self) { label in
-                            SettingsRow(label: label, trailing: AnyView(chevron))
-                            if label != "Acknowledgments" {
-                                Divider().padding(.leading, 16)
-                            }
+                        Button { openURL("https://aurax.ai/privacy") } label: {
+                            SettingsRow(label: "Privacy Policy", trailing: AnyView(chevron))
                         }
+                        .buttonStyle(.plain)
+
+                        Divider().padding(.leading, 16)
+
+                        Button { openURL("https://aurax.ai/terms") } label: {
+                            SettingsRow(label: "Terms of Service", trailing: AnyView(chevron))
+                        }
+                        .buttonStyle(.plain)
+
+                        Divider().padding(.leading, 16)
+
+                        SettingsRow(label: "Acknowledgments", trailing: AnyView(chevron))
                     }
 
                     // Danger Zone
                     SettingsSection(title: "Danger Zone") {
-                        SettingsRow(label: "Clear History", isDestructive: true, trailing: nil)
+                        Button { showClearHistoryAlert = true } label: {
+                            SettingsRow(label: "Clear History", isDestructive: true, trailing: nil)
+                        }
+                        .buttonStyle(.plain)
+                        .alert("Clear History?", isPresented: $showClearHistoryAlert) {
+                            Button("Clear", role: .destructive) { appState.history.removeAll() }
+                            Button("Cancel", role: .cancel) {}
+                        } message: {
+                            Text("All past generations will be removed. This cannot be undone.")
+                        }
+
                         Divider().padding(.leading, 16)
-                        SettingsRow(label: "Delete All Data", isDestructive: true, trailing: nil)
+
+                        Button { showDeleteDataAlert = true } label: {
+                            SettingsRow(label: "Delete All Data", isDestructive: true, trailing: nil)
+                        }
+                        .buttonStyle(.plain)
+                        .alert("Delete All Data?", isPresented: $showDeleteDataAlert) {
+                            Button("Delete", role: .destructive) {
+                                appState.history.removeAll()
+                                appState.creditManager.resetCredits()
+                            }
+                            Button("Cancel", role: .cancel) {}
+                        } message: {
+                            Text("Your history and credits will be permanently deleted.")
+                        }
                     }
 
                     // Footer
-                    Text("Hair Lens - AI v1.0 (Build 1)\nMade with ❤️ by Shubham")
+                    Text("Hair Lens - AI v1.0 (Build 2)\nMade with ❤️ by Shubham")
                         .font(.system(size: 12))
                         .foregroundStyle(Color.hairTextSec)
                         .multilineTextAlignment(.center)
@@ -125,6 +170,26 @@ struct SettingsView: View {
         Image(systemName: "chevron.right")
             .font(.system(size: 12, weight: .semibold))
             .foregroundStyle(Color.hairTextSec)
+    }
+
+    private func rateApp() {
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
+        }
+    }
+
+    private func shareApp() {
+        let appURL = URL(string: "https://apps.apple.com/app/id6745742590")!
+        let av = UIActivityViewController(activityItems: [appURL], applicationActivities: nil)
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows.first?.rootViewController?
+            .present(av, animated: true)
+    }
+
+    private func openURL(_ string: String) {
+        guard let url = URL(string: string) else { return }
+        UIApplication.shared.open(url)
     }
 }
 

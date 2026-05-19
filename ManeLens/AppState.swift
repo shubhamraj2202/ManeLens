@@ -6,6 +6,8 @@ struct GenerationRecord: Identifiable {
     let style: HairStyle
     var liked: Bool = false
     let date: Date = .now
+    let originalImage: UIImage?
+    let resultImage: UIImage?
 }
 
 @Observable
@@ -24,7 +26,7 @@ class AppState {
     func consumeCredit() { creditManager.consume() }
     func refundCredit()  { creditManager.refund() }
 
-    func recordGeneration(style: HairStyle) {
-        history.insert(GenerationRecord(style: style), at: 0)
+    func recordGeneration(style: HairStyle, original: UIImage?, result: UIImage?) {
+        history.insert(GenerationRecord(style: style, originalImage: original, resultImage: result), at: 0)
     }
 }

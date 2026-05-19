@@ -245,26 +245,32 @@ Plus 3 free credits on first install. Margin math: Standard pack @ $7.99 → ~$6
 ## Session Status
 
 **Last Updated:** 2026-05-19
-**Current State:** SESSION 7 COMPLETE — StoreKit 2 wired, all known bugs fixed, Worker credit ledger live.
+**Current State:** SESSION 8 COMPLETE — StoreKit config file added, HistoryView wired to real images, all Settings rows interactive, build number bumped to 2.
 **What's Working:**
 - Full generate pipeline: photo pick → face validate → compress → POST Worker → before/after slider result
-- `Services/CreditManager.swift` — @MainActor @Observable; StoreKit 2 load/purchase/restore; credits in UserDefaults (`hairlens_credits_v1`); 3 free on first install; notifies Worker `/credits/purchase` on purchase
-- `Services/APIClient.swift` — handles 402 `payment_required` → `.paymentRequired`; ContentView routes to Paywall
-- `AppState.swift` — credits delegated to CreditManager; no more in-memory reset on launch
-- **BUG FIXED**: Onboarding no longer repeats — `hairlens_has_seen_onboarding` UserDefaults flag; `ContentView.initialScreen()` reads at launch
-- **BUG FIXED**: Credits persist across launches — UserDefaults via CreditManager
-- **BUG FIXED**: Export no longer crashes — `PHPhotoLibrary.requestAddOnlyAuthorization` + `NSPhotoLibraryAddUsageDescription` in pbxproj; toast shows result
-- **BUG FIXED**: Camera permission string — `NSCameraUsageDescription` added to pbxproj
-- `PaywallView.swift` — real StoreKit products; localized `product.displayPrice`; purchase + restore wired
-- `SettingsView.swift` — Restore Purchases button live with error alert
-- Worker `POST /credits/purchase` — JWS decode, idempotency via `tx:{transactionId}`, adds to `credits:{deviceId}`
-- Worker `GET /credits/balance` — returns server-side balance
-- Worker `POST /hair/generate` — credit check (402 if balance=0 after first purchase), deducts 1, returns real `creditsRemaining`
-- Both envs deployed 2026-05-19
+- `Services/CreditManager.swift` — @MainActor @Observable; StoreKit 2 load/purchase/restore; credits in UserDefaults; 3 free on first install; `resetCredits()` added for Delete All Data
+- `ManeLens/Configuration.storekit` — StoreKit test config with all 3 products (credits_10/30/100); use in Xcode: Product → Scheme → Edit Scheme → Run → Options → StoreKit Configuration
+- `AppState.swift` — `GenerationRecord` now stores `originalImage: UIImage?` and `resultImage: UIImage?`; `recordGeneration(style:original:result:)` captures both images at generation time
+- `Views/HistoryView.swift` — `HistoryCard` shows real result image thumbnail (falls back to `HairFaceView` if nil); relative date label (Today/Yesterday/date); empty state updated to "No generations yet — pick a style to get started"
+- `ContentView.swift` — history item tap restores `appState.selectedPhoto` + `appState.generatedImage` before navigating to ResultView
+- `Views/SettingsView.swift` — all rows wired:
+  - Rate App → `SKStoreReviewController.requestReview(in:)`
+  - Share App → `UIActivityViewController` with App Store URL
+  - Help & FAQ / Contact Support → `mailto:shubhamraj2202@gmail.com`
+  - Privacy Policy → `https://aurax.ai/privacy`
+  - Terms of Service → `https://aurax.ai/terms`
+  - Clear History → confirm alert → `appState.history.removeAll()`
+  - Delete All Data → confirm alert → clear history + `creditManager.resetCredits()`
+- Build number bumped to 2 (both Debug + Release in project.pbxproj)
 
 **Known Issues:** SourceKit cross-file errors resolve at Xcode build time (PBXFileSystemSynchronizedRootGroup — normal).
-**StoreKit prerequisite:** Create `credits_10`, `credits_30`, `credits_100` as Consumable IAPs in App Store Connect before purchase flow works on device. Use a sandbox tester account.
-**Next Step:** Session 8 — App Store Connect IAP setup + sandbox testing + TestFlight build + App Store screenshots.
+**Manual steps still needed:**
+1. **App Store Connect IAPs** — Create `credits_10`, `credits_30`, `credits_100` as Consumable IAPs (Type: Consumable; prices: $2.99/$7.99/$19.99; Reference names: Starter/Standard/Pro Credits)
+2. **Scheme setup** — In Xcode: Product → Scheme → Edit Scheme → Run → Options → StoreKit Configuration → select `Configuration.storekit`
+3. **TestFlight** — Archive (Product → Archive) → Distribute → App Store Connect → upload; add shubhamraj2202@gmail.com as internal tester
+4. **Privacy/Terms URLs** — Update `https://aurax.ai/privacy` and `https://aurax.ai/terms` in SettingsView once pages are live
+5. **Share App URL** — Update `https://apps.apple.com/app/id6745742590` in SettingsView once app is live on App Store
+**Next Step:** Session 9 — App Store screenshots, metadata, App Store submission prep.
 
 ---
 

@@ -47,11 +47,11 @@ struct HistoryView: View {
             Text("🪞")
                 .font(.system(size: 52))
 
-            Text("Nothing to see… yet")
+            Text("No generations yet")
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(Color.hairText)
 
-            Text("Your first preview is one tap away")
+            Text("Pick a style to get started")
                 .font(.system(size: 14))
                 .foregroundStyle(Color.hairTextSec)
                 .multilineTextAlignment(.center)
@@ -86,16 +86,33 @@ private struct HistoryCard: View {
     let record: GenerationRecord
     let action: () -> Void
 
+    private var relativeDate: String {
+        let cal = Calendar.current
+        if cal.isDateInToday(record.date) { return "Today" }
+        if cal.isDateInYesterday(record.date) { return "Yesterday" }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        return formatter.string(from: record.date)
+    }
+
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 0) {
                 ZStack(alignment: .topTrailing) {
-                    HairFaceView(
-                        hairColor: record.style.hairColor,
-                        bgColors: record.style.gradientColors
-                    )
-                    .frame(height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    if let img = record.resultImage {
+                        Image(uiImage: img)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 120)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    } else {
+                        HairFaceView(
+                            hairColor: record.style.hairColor,
+                            bgColors: record.style.gradientColors
+                        )
+                        .frame(height: 120)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
 
                     if record.liked {
                         Text("❤️")
@@ -110,7 +127,7 @@ private struct HistoryCard: View {
                         .foregroundStyle(Color.hairText)
                         .lineLimit(1)
 
-                    Text("Today")
+                    Text(relativeDate)
                         .font(.system(size: 10))
                         .foregroundStyle(Color.hairTextSec)
                 }

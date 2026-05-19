@@ -87,6 +87,11 @@ final class CreditManager {
         persist()
     }
 
+    func resetCredits() {
+        credits = 0
+        persist()
+    }
+
     // MARK: - Internals
 
     private func apply(credits n: Int, jws: String) async {
