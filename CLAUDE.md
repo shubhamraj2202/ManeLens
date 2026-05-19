@@ -246,7 +246,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-19
-**Current State:** SESSION 8 COMPLETE — StoreKit config file added, HistoryView wired to real images, all Settings rows interactive, build number bumped to 2.
+**Current State:** SESSION 8 COMPLETE (with hotfixes) — StoreKit config, HistoryView real images, Settings wired, build fixes for iOS 26 SDK changes.
 **What's Working:**
 - Full generate pipeline: photo pick → face validate → compress → POST Worker → before/after slider result
 - `Services/CreditManager.swift` — @MainActor @Observable; StoreKit 2 load/purchase/restore; credits in UserDefaults; 3 free on first install; `resetCredits()` added for Delete All Data
@@ -264,18 +264,50 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
   - Delete All Data → confirm alert → clear history + `creditManager.resetCredits()`
 - Build number bumped to 2 (both Debug + Release in project.pbxproj)
 
+**iOS 26 SDK fixes applied (all build errors resolved):**
+- `Transaction.jwsRepresentation` removed → replaced with `String(tx.id)` + `tx.productID`
+- `PHPhotoLibrary.requestAddOnlyAuthorization` removed → `PHPhotoLibrary.requestAuthorization(for: .addOnly)` async
+- `SKStoreReviewController.requestReview(in:)` deprecated → `AppStore.requestReview(in:)`
+- `updates` property nonisolated deinit error → `nonisolated(unsafe)` on property
+- `restoreError` private(set) access → added `clearRestoreError()` to CreditManager
+- Worker `/credits/purchase` simplified: accepts `{deviceId, productId, transactionId}` directly (no JWS decode)
+
 **Known Issues:** SourceKit cross-file errors resolve at Xcode build time (PBXFileSystemSynchronizedRootGroup — normal).
-**Manual steps still needed:**
-1. **App Store Connect IAPs** — Create 4 Consumable IAPs (exact product IDs must match):
-   - `credits_5`   · Try It Credits     · ₹99  / $0.99 / ¥150
-   - `credits_20`  · Starter Credits    · ₹299 / $1.99 / ¥300
-   - `credits_60`  · Standard Credits   · ₹499 / $4.99 / ¥750   ← mark as "Best Value"
-   - `credits_200` · Pro Credits        · ₹999 / $9.99 / ¥1,500
-2. **Scheme setup** — In Xcode: Product → Scheme → Edit Scheme → Run → Options → StoreKit Configuration → select `Configuration.storekit`
-3. **TestFlight** — Archive (Product → Archive) → Distribute → App Store Connect → upload; add shubhamraj2202@gmail.com as internal tester
-4. **Privacy/Terms URLs** — Update `https://aurax.ai/privacy` and `https://aurax.ai/terms` in SettingsView once pages are live
-5. **Share App URL** — Update `https://apps.apple.com/app/id6745742590` in SettingsView once app is live on App Store
-**Next Step:** Session 9 — App Store screenshots, metadata, App Store submission prep.
+
+**MANUAL STEPS STILL PENDING (App Store Connect):**
+
+Step 1 — Create 4 Consumable IAPs. For EACH product:
+  a) Monetization → In-App Purchases → + → Consumable
+  b) Enter Product ID exactly as shown (case-sensitive)
+  c) Set price tier
+  d) Click "Add Localization" → English → enter Display Name + Description
+  e) Upload a screenshot of PaywallView under "Review Information → Screenshot"
+  f) Save
+
+  | Product ID   | Display Name     | Description                          | Price Tier | ₹   | ¥     |
+  |-------------|-----------------|--------------------------------------|-----------|-----|-------|
+  | credits_5   | Try It          | 5 hair style previews                | Tier 1    | 99  | 150   |
+  | credits_20  | Starter Credits | 20 hair style previews               | Tier 2    | 299 | 300   |
+  | credits_60  | Standard Credits| 60 hair style previews — best value  | Tier 5    | 499 | 750   |
+  | credits_200 | Pro Credits     | 200 hair style previews              | Tier 10   | 999 | 1,500 |
+
+Step 2 — Wire StoreKit config in Xcode for simulator testing:
+  Product → Scheme → Edit Scheme → Run → Options → StoreKit Configuration → Configuration.storekit
+
+Step 3 — Create Sandbox Tester (for device purchase testing):
+  App Store Connect → Users and Access → Sandbox Testers → + → use email NOT your real Apple ID
+
+Step 4 — TestFlight build:
+  - Xcode: select "Any iOS Device (arm64)" as destination
+  - Product → Archive → Distribute App → App Store Connect → Upload
+  - App Store Connect → TestFlight → add shubhamraj2202@gmail.com as internal tester
+
+Step 5 — Update placeholder URLs in SettingsView.swift once live:
+  - Line ~87: https://aurax.ai/privacy
+  - Line ~93: https://aurax.ai/terms
+  - Line ~177: https://apps.apple.com/app/id6745742590
+
+**Next Step:** Session 9 — App Store screenshots + metadata + submission.
 
 ---
 
