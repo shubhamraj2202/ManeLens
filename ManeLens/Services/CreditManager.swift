@@ -14,7 +14,8 @@ final class CreditManager {
     private static let firstRunKey  = "hairlens_first_run_v1"
     private static let workerBase   = "https://aurax-api.auraxai.workers.dev"
 
-    private var updates: Task<Void, Never>?
+    // nonisolated(unsafe) so deinit (which is nonisolated) can cancel it
+    nonisolated(unsafe) private var updates: Task<Void, Never>?
 
     init() {
         let stored = UserDefaults.standard.integer(forKey: Self.creditsKey)
@@ -25,7 +26,7 @@ final class CreditManager {
         } else {
             credits = stored
         }
-        updates = Task { await self.observeTransactionUpdates() }
+        updates = Task { @MainActor in await self.observeTransactionUpdates() }
     }
 
     deinit { updates?.cancel() }
@@ -50,7 +51,7 @@ final class CreditManager {
             switch result {
             case .success(.verified(let tx)):
                 let n = creditsFor(productID: tx.productID)
-                await apply(credits: n, jws: tx.jwsRepresentation)
+                await apply(credits: n, transactionID: String(tx.id), productID: tx.productID)
                 await tx.finish()
             case .success(.unverified): break
             case .pending: break
@@ -62,7 +63,7 @@ final class CreditManager {
         }
     }
 
-    // MARK: - Restore (subscriptions / non-consumables only; consumables are re-purchased)
+    // MARK: - Restore
 
     func restore() async {
         restoreError = nil
@@ -74,7 +75,7 @@ final class CreditManager {
         }
     }
 
-    // MARK: - Local credit ops (called by AppState)
+    // MARK: - Local credit ops
 
     func consume() {
         guard credits > 0 else { return }
@@ -94,10 +95,10 @@ final class CreditManager {
 
     // MARK: - Internals
 
-    private func apply(credits n: Int, jws: String) async {
+    private func apply(credits n: Int, transactionID: String, productID: String) async {
         credits += n
         persist()
-        notifyWorker(jws: jws)
+        notifyWorker(transactionID: transactionID, productID: productID)
     }
 
     private func persist() {
@@ -114,13 +115,17 @@ final class CreditManager {
         }
     }
 
-    private func notifyWorker(jws: String) {
+    private func notifyWorker(transactionID: String, productID: String) {
         let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? ""
         guard !deviceId.isEmpty else { return }
         var req = URLRequest(url: URL(string: "\(Self.workerBase)/credits/purchase")!)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = try? JSONSerialization.data(withJSONObject: ["jwsToken": jws, "deviceId": deviceId])
+        req.httpBody = try? JSONSerialization.data(withJSONObject: [
+            "deviceId": deviceId,
+            "productId": productID,
+            "transactionId": transactionID
+        ])
         Task.detached { _ = try? await URLSession.shared.data(for: req) }
     }
 
@@ -128,7 +133,7 @@ final class CreditManager {
         for await result in Transaction.updates {
             guard case .verified(let tx) = result else { continue }
             let n = creditsFor(productID: tx.productID)
-            await apply(credits: n, jws: tx.jwsRepresentation)
+            await apply(credits: n, transactionID: String(tx.id), productID: tx.productID)
             await tx.finish()
         }
     }
