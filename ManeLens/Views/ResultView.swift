@@ -149,8 +149,9 @@ struct ResultView: View {
 
     private func exportImage() {
         guard let image = appState.generatedImage else { return }
-        PHPhotoLibrary.requestAddOnlyAuthorization { status in
-            DispatchQueue.main.async {
+        Task {
+            let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+            await MainActor.run {
                 switch status {
                 case .authorized, .limited:
                     UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
