@@ -246,7 +246,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-19
-**Current State:** SESSION 8 COMPLETE (with hotfixes) — StoreKit config, HistoryView real images, Settings wired, build fixes for iOS 26 SDK changes.
+**Current State:** SESSION 9 IN PROGRESS — build number bumped to 3, Screenshots/ directory + App Store metadata created. Manual steps (screenshots, archive, TestFlight upload) remain.
 **What's Working:**
 - Full generate pipeline: photo pick → face validate → compress → POST Worker → before/after slider result
 - `Services/CreditManager.swift` — @MainActor @Observable; StoreKit 2 load/purchase/restore; credits in UserDefaults; 3 free on first install; `resetCredits()` added for Delete All Data
