@@ -93,6 +93,10 @@ final class CreditManager {
         persist()
     }
 
+    func clearRestoreError() {
+        restoreError = nil
+    }
+
     // MARK: - Internals
 
     private func apply(credits n: Int, transactionID: String, productID: String) async {

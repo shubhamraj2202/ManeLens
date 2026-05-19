@@ -40,9 +40,9 @@ struct SettingsView: View {
                         .alert("Restore Failed",
                                isPresented: Binding(
                                 get: { appState.creditManager.restoreError != nil },
-                                set: { if !$0 { appState.creditManager.restoreError = nil } }
+                                set: { if !$0 { appState.creditManager.clearRestoreError() } }
                                )) {
-                            Button("OK") { appState.creditManager.restoreError = nil }
+                            Button("OK") { appState.creditManager.clearRestoreError() }
                         } message: {
                             Text(appState.creditManager.restoreError ?? "")
                         }
@@ -174,7 +174,7 @@ struct SettingsView: View {
 
     private func rateApp() {
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            SKStoreReviewController.requestReview(in: scene)
+            AppStore.requestReview(in: scene)
         }
     }
 
