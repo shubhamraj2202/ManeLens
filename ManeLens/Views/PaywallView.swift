@@ -106,7 +106,7 @@ struct PaywallView: View {
         .task {
             await creditManager.loadProducts()
             if selectedProduct == nil {
-                selectedProduct = creditManager.products.first(where: { $0.id == "credits_30" })
+                selectedProduct = creditManager.products.first(where: { $0.id == "credits_60" })
                              ?? creditManager.products.first
             }
         }
@@ -174,9 +174,10 @@ private struct PackCard: View {
 
     private var packName: String {
         switch product.id {
-        case "credits_10":  return "Starter"
-        case "credits_30":  return "Standard"
-        case "credits_100": return "Pro Pack"
+        case "credits_5":   return "Try It"
+        case "credits_20":  return "Starter"
+        case "credits_60":  return "Standard"
+        case "credits_200": return "Pro Pack"
         default: return product.id
         }
     }

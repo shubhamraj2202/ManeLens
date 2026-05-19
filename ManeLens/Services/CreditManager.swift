@@ -9,7 +9,7 @@ final class CreditManager {
     private(set) var isPurchasing = false
     private(set) var restoreError: String? = nil
 
-    static let productIDs = ["credits_10", "credits_30", "credits_100"]
+    static let productIDs = ["credits_5", "credits_20", "credits_60", "credits_200"]
     private static let creditsKey   = "hairlens_credits_v1"
     private static let firstRunKey  = "hairlens_first_run_v1"
     private static let workerBase   = "https://aurax-api.auraxai.workers.dev"
@@ -106,9 +106,10 @@ final class CreditManager {
 
     private func creditsFor(productID: String) -> Int {
         switch productID {
-        case "credits_10":  return 10
-        case "credits_30":  return 30
-        case "credits_100": return 100
+        case "credits_5":   return 5
+        case "credits_20":  return 20
+        case "credits_60":  return 60
+        case "credits_200": return 200
         default: return 0
         }
     }
@@ -138,23 +139,25 @@ final class CreditManager {
 extension CreditManager {
     static func creditsLabel(for productID: String) -> Int {
         switch productID {
-        case "credits_10":  return 10
-        case "credits_30":  return 30
-        case "credits_100": return 100
+        case "credits_5":   return 5
+        case "credits_20":  return 20
+        case "credits_60":  return 60
+        case "credits_200": return 200
         default: return 0
         }
     }
 
     static func descriptionLabel(for productID: String) -> String {
         switch productID {
-        case "credits_10":  return "Try a few styles"
-        case "credits_30":  return "Best value — save 16%"
-        case "credits_100": return "For serious style hunters"
+        case "credits_5":   return "Try it out — no commitment"
+        case "credits_20":  return "Perfect for a style refresh"
+        case "credits_60":  return "Best value — most popular"
+        case "credits_200": return "For serious style hunters"
         default: return ""
         }
     }
 
     static func badge(for productID: String) -> String? {
-        productID == "credits_30" ? "BEST VALUE" : nil
+        productID == "credits_60" ? "BEST VALUE" : nil
     }
 }

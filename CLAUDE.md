@@ -219,13 +219,14 @@ The output must look like a real unedited photograph of this exact person with t
 
 ## Pricing (V1)
 
-| Pack | Credits | India ₹ | Japan ¥ | US $ |
-|------|---------|---------|---------|------|
-| Starter | 10 | 199 | 299 | 2.99 |
-| Standard ⭐ | 30 | 499 | 799 | 7.99 |
-| Pro | 100 | 1,499 | 2,399 | 19.99 |
+| Pack | Product ID | Credits | India ₹ | Japan ¥ | US $ | Cost/use |
+|------|-----------|---------|---------|---------|------|----------|
+| Try It | credits_5 | 5 | 99 | 150 | 0.99 | $0.20 |
+| Starter | credits_20 | 20 | 299 | 300 | 1.99 | $0.10 |
+| Standard ⭐ | credits_60 | 60 | 499 | 750 | 4.99 | $0.08 |
+| Pro | credits_200 | 200 | 999 | 1,500 | 9.99 | $0.05 |
 
-Plus 3 free credits on first install. Margin math: Standard pack @ $7.99 → ~$6.79 net (15% small biz) → ~$1.20 API cost → ~$5.60 profit/pack.
+Plus 3 free credits on first install. Pricing rationale: one bad haircut costs ₹1000 and takes 3 months to grow out — 20 previews at ₹299 is a bargain. Entry at ₹99/$0.99 removes "is it worth it?" friction. Margin math: Standard @ $4.99 → ~$4.24 net → ~$2.34 Gemini cost (60 × $0.039) → ~$1.90 profit/pack. Pro @ $9.99 → ~$8.49 net → ~$7.80 Gemini cost → ~$0.69 profit (volume play).
 
 ---
 
@@ -265,7 +266,11 @@ Plus 3 free credits on first install. Margin math: Standard pack @ $7.99 → ~$6
 
 **Known Issues:** SourceKit cross-file errors resolve at Xcode build time (PBXFileSystemSynchronizedRootGroup — normal).
 **Manual steps still needed:**
-1. **App Store Connect IAPs** — Create `credits_10`, `credits_30`, `credits_100` as Consumable IAPs (Type: Consumable; prices: $2.99/$7.99/$19.99; Reference names: Starter/Standard/Pro Credits)
+1. **App Store Connect IAPs** — Create 4 Consumable IAPs (exact product IDs must match):
+   - `credits_5`   · Try It Credits     · ₹99  / $0.99 / ¥150
+   - `credits_20`  · Starter Credits    · ₹299 / $1.99 / ¥300
+   - `credits_60`  · Standard Credits   · ₹499 / $4.99 / ¥750   ← mark as "Best Value"
+   - `credits_200` · Pro Credits        · ₹999 / $9.99 / ¥1,500
 2. **Scheme setup** — In Xcode: Product → Scheme → Edit Scheme → Run → Options → StoreKit Configuration → select `Configuration.storekit`
 3. **TestFlight** — Archive (Product → Archive) → Distribute → App Store Connect → upload; add shubhamraj2202@gmail.com as internal tester
 4. **Privacy/Terms URLs** — Update `https://aurax.ai/privacy` and `https://aurax.ai/terms` in SettingsView once pages are live
