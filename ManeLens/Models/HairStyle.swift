@@ -44,7 +44,8 @@ extension HairStyle {
             ],
             description: "A trendy layered cut with face-framing texture and shaggy ends, popularized by K-pop idols.",
             styleKey: "wolf_cut",
-            isNew: true
+            isNew: true,
+            sampleImages: ["sample_wolf_cut_1", "sample_wolf_cut_2"]
         ),
         HairStyle(
             id: 3, name: "Indian Bridal Updo", category: "Wedding", gender: "Female",
@@ -56,7 +57,7 @@ extension HairStyle {
             ],
             description: "An elaborate swept-up style adorned with layers and volume, ideal for traditional ceremonies.",
             styleKey: "indian_wedding_updo",
-            sampleImages: ["sample_indian_wedding_updo_1"]
+            sampleImages: ["sample_indian_wedding_updo_1", "sample_indian_wedding_updo_2"]
         ),
         HairStyle(
             id: 4, name: "French Crop Fade", category: "Casual", gender: "Male",
@@ -79,7 +80,8 @@ extension HairStyle {
                 Color(red: 0.769, green: 0.533, blue: 0.220),
             ],
             description: "Effortless, sun-kissed waves with natural texture and movement for a carefree, confident look.",
-            styleKey: "beach_blonde_waves"
+            styleKey: "beach_blonde_waves",
+            sampleImages: ["sample_beach_blonde_waves_1", "sample_beach_blonde_waves_2"]
         ),
         HairStyle(
             id: 6, name: "Curtain Bangs", category: "Salon", gender: "Unisex",
@@ -90,7 +92,8 @@ extension HairStyle {
                 Color(red: 0.541, green: 0.333, blue: 0.208),
             ],
             description: "Soft, face-framing bangs that split naturally at the center, giving a relaxed, editorial feel.",
-            styleKey: "curtain_bangs"
+            styleKey: "curtain_bangs",
+            sampleImages: ["sample_curtain_bangs_1", "sample_curtain_bangs_2"]
         ),
 
         // ── Male styles ────────────────────────────────────────────────────
@@ -168,7 +171,8 @@ extension HairStyle {
                 Color(red: 0.310, green: 0.196, blue: 0.094),
             ],
             description: "A clean, chin-length cut with blunt ends — timeless, chic, and flattering on every face shape.",
-            styleKey: "classic_bob"
+            styleKey: "classic_bob",
+            sampleImages: ["sample_classic_bob_1", "sample_classic_bob_2"]
         ),
         HairStyle(
             id: 13, name: "Pixie Cut", category: "Bold", gender: "Female",
@@ -179,7 +183,8 @@ extension HairStyle {
                 Color(red: 0.220, green: 0.149, blue: 0.078),
             ],
             description: "Short, daring, and deeply feminine — the pixie is a statement of effortless confidence.",
-            styleKey: "pixie_cut"
+            styleKey: "pixie_cut",
+            sampleImages: ["sample_pixie_cut_1", "sample_pixie_cut_2"]
         ),
         HairStyle(
             id: 14, name: "Long Straight", category: "Casual", gender: "Female",
@@ -190,7 +195,8 @@ extension HairStyle {
                 Color(red: 0.118, green: 0.078, blue: 0.039),
             ],
             description: "Sleek, pin-straight locks flowing well past the shoulders — classic elegance at its purest.",
-            styleKey: "long_straight"
+            styleKey: "long_straight",
+            sampleImages: ["sample_long_straight_1", "sample_long_straight_2"]
         ),
         HairStyle(
             id: 15, name: "Side Swept Bangs", category: "Salon", gender: "Female",
@@ -201,7 +207,8 @@ extension HairStyle {
                 Color(red: 0.596, green: 0.396, blue: 0.188),
             ],
             description: "Caramel waves swept softly to one side, framing the face with romantic, cascading texture.",
-            styleKey: "side_swept_bangs"
+            styleKey: "side_swept_bangs",
+            sampleImages: ["sample_side_swept_bangs_1", "sample_side_swept_bangs_2"]
         ),
         HairStyle(
             id: 16, name: "Braided Bridal", category: "Wedding", gender: "Female",
@@ -212,7 +219,8 @@ extension HairStyle {
                 Color(red: 0.176, green: 0.063, blue: 0.063),
             ],
             description: "Intricate braids woven into an elegant updo — perfect for a bride who wants tradition with artistry.",
-            styleKey: "braided_bridal_updo"
+            styleKey: "braided_bridal_updo",
+            sampleImages: ["sample_braided_bridal_updo_1", "sample_braided_bridal_updo_2"]
         ),
         HairStyle(
             id: 17, name: "Reception Waves", category: "Wedding", gender: "Female",
@@ -223,7 +231,8 @@ extension HairStyle {
                 Color(red: 0.773, green: 0.647, blue: 0.431),
             ],
             description: "Soft, glamorous waves with champagne-gold tones — ideal for a wedding reception or evening event.",
-            styleKey: "reception_waves"
+            styleKey: "reception_waves",
+            sampleImages: ["sample_reception_waves_1", "sample_reception_waves_2"]
         ),
         HairStyle(
             id: 18, name: "Platinum Blonde", category: "Bold", gender: "Female",
@@ -235,7 +244,8 @@ extension HairStyle {
             ],
             description: "Ice-cold platinum from root to tip — the boldest statement in hair, for those who own every room.",
             styleKey: "platinum_blonde",
-            isNew: true
+            isNew: true,
+            sampleImages: ["sample_platinum_blonde_1", "sample_platinum_blonde_2"]
         ),
         HairStyle(
             id: 19, name: "Balayage", category: "Salon", gender: "Female",
@@ -247,7 +257,8 @@ extension HairStyle {
             ],
             description: "Hand-painted sun-kissed highlights blending from deep roots to honey ends — effortlessly dimensional.",
             styleKey: "balayage_highlights",
-            isNew: true
+            isNew: true,
+            sampleImages: ["sample_balayage_highlights_1", "sample_balayage_highlights_2"]
         ),
         HairStyle(
             id: 20, name: "Ivy League", category: "Casual", gender: "Male",
