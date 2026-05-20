@@ -11,47 +11,58 @@ struct PaywallView: View {
     private var creditManager: CreditManager { appState.creditManager }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 24) {
-                    // Hero
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                // Hero
+                VStack(spacing: 12) {
+                    Text("✨")
+                        .font(.system(size: 52))
+
+                    Text("Out of Credits")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundStyle(Color.hairText)
+
+                    Text("Get more previews to find your perfect look")
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color.hairTextSec)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, 20)
+
+                // Pack cards
+                if creditManager.products.isEmpty {
+                    ProgressView()
+                        .padding(.vertical, 40)
+                } else {
                     VStack(spacing: 12) {
-                        Text("✨")
-                            .font(.system(size: 52))
-
-                        Text("Out of Credits")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundStyle(Color.hairText)
-
-                        Text("Get more previews to find your perfect look")
-                            .font(.system(size: 15))
-                            .foregroundStyle(Color.hairTextSec)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.top, 20)
-
-                    // Pack cards
-                    if creditManager.products.isEmpty {
-                        ProgressView()
-                            .padding(.vertical, 40)
-                    } else {
-                        VStack(spacing: 12) {
-                            ForEach(creditManager.products, id: \.id) { product in
-                                PackCard(
-                                    product: product,
-                                    selected: selectedProduct?.id == product.id,
-                                    onTap: { selectedProduct = product }
-                                )
-                            }
+                        ForEach(creditManager.products, id: \.id) { product in
+                            PackCard(
+                                product: product,
+                                selected: selectedProduct?.id == product.id,
+                                onTap: { selectedProduct = product }
+                            )
                         }
                     }
-
-                    Spacer(minLength: 120)
                 }
-                .padding(.horizontal, DS.paddingPage)
             }
-
-            // Bottom CTA
+            .padding(.horizontal, DS.paddingPage)
+            .padding(.bottom, 24)
+        }
+        .background(Color.hairBg)
+        .navigationBarHidden(true)
+        .overlay(alignment: .topTrailing) {
+            Button(action: onClose) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.hairText)
+                    .frame(width: 32, height: 32)
+                    .background(Color.black.opacity(0.07))
+                    .clipShape(Circle())
+            }
+            .padding(.top, 16)
+            .padding(.trailing, DS.paddingPage)
+        }
+        .safeAreaInset(edge: .bottom) {
             VStack(spacing: 14) {
                 PrimaryButton(
                     title: ctaTitle,
@@ -82,26 +93,12 @@ struct PaywallView: View {
                 }
             }
             .padding(.horizontal, DS.paddingPage)
-            .padding(.top, 20)
+            .padding(.top, 16)
             .padding(.bottom, 44)
             .background(
-                LinearGradient(colors: [.white.opacity(0), .white], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.2))
+                LinearGradient(colors: [.white.opacity(0), .white], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.3))
                     .ignoresSafeArea()
             )
-        }
-        .background(Color.hairBg)
-        .navigationBarHidden(true)
-        .overlay(alignment: .topTrailing) {
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.hairText)
-                    .frame(width: 32, height: 32)
-                    .background(Color.black.opacity(0.07))
-                    .clipShape(Circle())
-            }
-            .padding(.top, 16)
-            .padding(.trailing, DS.paddingPage)
         }
         .task {
             await creditManager.loadProducts()

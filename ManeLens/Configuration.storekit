@@ -1,11 +1,13 @@
 {
-  "identifier" : "A1B2C3D4-E5F6-7890-ABCD-EF1234560001",
-  "nonRenewingSubscriptions" : [],
+  "identifier" : "47AE4877-7B75-4647-9083-1BABD76C9918",
+  "nonRenewingSubscriptions" : [
+
+  ],
   "products" : [
     {
       "displayPrice" : "0.99",
       "familyShareable" : false,
-      "internalID" : "A1B2C3D4-E5F6-7890-ABCD-EF1234560005",
+      "internalID" : "C422CE93-22F1-4B3E-AD05-69BB6DCF7A3D",
       "localizations" : [
         {
           "description" : "5 hair style preview credits to try the app",
@@ -20,7 +22,7 @@
     {
       "displayPrice" : "1.99",
       "familyShareable" : false,
-      "internalID" : "A1B2C3D4-E5F6-7890-ABCD-EF1234560020",
+      "internalID" : "7C036D42-9D19-40F3-A0E1-6B40F0C48842",
       "localizations" : [
         {
           "description" : "20 hair style preview credits",
@@ -35,7 +37,7 @@
     {
       "displayPrice" : "4.99",
       "familyShareable" : false,
-      "internalID" : "A1B2C3D4-E5F6-7890-ABCD-EF1234560060",
+      "internalID" : "2552D52E-BE19-4D86-B4F6-007599D591BC",
       "localizations" : [
         {
           "description" : "60 hair style preview credits — best value",
@@ -50,7 +52,7 @@
     {
       "displayPrice" : "9.99",
       "familyShareable" : false,
-      "internalID" : "A1B2C3D4-E5F6-7890-ABCD-EF1234560200",
+      "internalID" : "827CF80B-05F8-4951-A61B-60EB3CF4DCCD",
       "localizations" : [
         {
           "description" : "200 hair style preview credits for serious style hunters",
@@ -66,7 +68,9 @@
   "settings" : {
 
   },
-  "subscriptionGroups" : [],
+  "subscriptionGroups" : [
+
+  ],
   "version" : {
     "major" : 2,
     "minor" : 0,

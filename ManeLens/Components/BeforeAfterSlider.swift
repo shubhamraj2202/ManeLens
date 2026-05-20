@@ -90,7 +90,7 @@ struct BeforeAfterSlider: View {
                     }
             )
         }
-        .aspectRatio(1.05, contentMode: .fit)
+        .aspectRatio(4/5, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .background(Color.black)
     }

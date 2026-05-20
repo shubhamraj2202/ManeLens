@@ -90,7 +90,7 @@ struct StyleDetailView: View {
                 }
             )
         )
-        .background(.ultraThinMaterial)
+        .background(Color.hairBg)
     }
 
     private var tipsSection: some View {

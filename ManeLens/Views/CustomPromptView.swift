@@ -99,7 +99,7 @@ struct CustomPromptView: View {
                     Spacer(minLength: 120)
                 }
                 .padding(.horizontal, DS.paddingPage)
-                .padding(.top, 8)
+                .padding(.top, 56)
             }
 
             // Bottom CTA

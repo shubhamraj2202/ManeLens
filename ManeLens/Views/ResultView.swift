@@ -1,5 +1,6 @@
 import SwiftUI
 import Photos
+import StoreKit
 
 struct ResultView: View {
     let style: HairStyle?
@@ -18,7 +19,7 @@ struct ResultView: View {
                     // Before/After slider with real images
                     if let before = appState.selectedPhoto, let after = appState.generatedImage {
                         BeforeAfterSlider(before: before, after: after)
-                            .padding(.top, 52)
+                            .padding(.top, 56)
                     }
 
                     VStack(spacing: 16) {
@@ -42,8 +43,8 @@ struct ResultView: View {
 
                         // Action bar
                         HStack(spacing: 0) {
-                            ActionButton(icon: saved ? "heart.fill" : "heart", label: "Save", active: saved) {
-                                saved.toggle()
+                            ActionButton(icon: saved ? "checkmark.circle.fill" : "arrow.down.to.line", label: saved ? "Saved" : "Save", active: saved) {
+                                if !saved { exportImage(); saved = true }
                             }
                             Divider().frame(height: 40)
                             ActionButton(icon: "arrow.down.to.line", label: "Export") {
@@ -73,7 +74,7 @@ struct ResultView: View {
 
             // Bottom CTA
             VStack(spacing: 0) {
-                PrimaryButton(title: "Try Another Style", icon: "scissors", variant: .primary, action: onTryAnother)
+                PrimaryButton(title: "Try Another Style", icon: "✂️", variant: .primary, action: onTryAnother)
             }
             .padding(.horizontal, DS.paddingPage)
             .padding(.top, 20)
@@ -105,18 +106,8 @@ struct ResultView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: exportMessage)
         .overlay(alignment: .top) {
-            ScreenNav(
-                title: "Your Preview",
-                onBack: onBack,
-                trailing: AnyView(
-                    Button(action: shareImage) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color.hairText)
-                    }
-                )
-            )
-            .background(.ultraThinMaterial)
+            ScreenNav(title: "Your Preview", onBack: onBack)
+                .background(.ultraThinMaterial)
         }
     }
 
@@ -127,7 +118,12 @@ struct ResultView: View {
                 .foregroundStyle(Color.hairText)
 
             HStack(spacing: 10) {
-                FeedbackButton(icon: "👍", label: "Love it", selected: liked == true) { liked = true }
+                FeedbackButton(icon: "👍", label: "Love it", selected: liked == true) {
+                    liked = true
+                    if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                        AppStore.requestReview(in: scene)
+                    }
+                }
                 FeedbackButton(icon: "👎", label: "Not quite", selected: liked == false) { liked = false }
             }
         }

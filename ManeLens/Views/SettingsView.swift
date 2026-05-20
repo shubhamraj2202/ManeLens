@@ -6,11 +6,7 @@ struct SettingsView: View {
     var onBack: () -> Void
     var onGetMore: () -> Void
 
-    @State private var appearance = "System"
-    @State private var saveToPhotos = true
-    @State private var hapticFeedback = true
     @State private var showClearHistoryAlert = false
-    @State private var showDeleteDataAlert = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -48,28 +44,6 @@ struct SettingsView: View {
                         }
                     }
 
-                    // Preferences
-                    SettingsSection(title: "Preferences") {
-                        SettingsRow(label: "Appearance", trailing: AnyView(
-                            Picker("", selection: $appearance) {
-                                ForEach(["Light", "Dark", "System"], id: \.self) { Text($0) }
-                            }
-                            .pickerStyle(.segmented)
-                            .frame(width: 160)
-                        ))
-                        Divider().padding(.leading, 16)
-                        SettingsRow(label: "Save originals to Photos", trailing: AnyView(
-                            Toggle("", isOn: $saveToPhotos)
-                                .tint(Color.hairPurple)
-                                .labelsHidden()
-                        ))
-                        Divider().padding(.leading, 16)
-                        SettingsRow(label: "Haptic feedback", trailing: AnyView(
-                            Toggle("", isOn: $hapticFeedback)
-                                .tint(Color.hairPurple)
-                                .labelsHidden()
-                        ))
-                    }
 
                     // About
                     SettingsSection(title: "About") {
@@ -102,14 +76,14 @@ struct SettingsView: View {
 
                     // Legal
                     SettingsSection(title: "Legal") {
-                        Button { openURL("https://aurax.ai/privacy") } label: {
+                        Button { openURL("https://shubhamraj2202.github.io/hairLens-privacy.html") } label: {
                             SettingsRow(label: "Privacy Policy", trailing: AnyView(chevron))
                         }
                         .buttonStyle(.plain)
 
                         Divider().padding(.leading, 16)
 
-                        Button { openURL("https://aurax.ai/terms") } label: {
+                        Button { openURL("https://shubhamraj2202.github.io/hairLens-terms.html") } label: {
                             SettingsRow(label: "Terms of Service", trailing: AnyView(chevron))
                         }
                         .buttonStyle(.plain)
@@ -119,34 +93,23 @@ struct SettingsView: View {
                         SettingsRow(label: "Acknowledgments", trailing: AnyView(chevron))
                     }
 
-                    // Danger Zone
-                    SettingsSection(title: "Danger Zone") {
-                        Button { showClearHistoryAlert = true } label: {
-                            SettingsRow(label: "Clear History", isDestructive: true, trailing: nil)
-                        }
-                        .buttonStyle(.plain)
-                        .alert("Clear History?", isPresented: $showClearHistoryAlert) {
-                            Button("Clear", role: .destructive) { appState.history.removeAll() }
-                            Button("Cancel", role: .cancel) {}
-                        } message: {
-                            Text("All past generations will be removed. This cannot be undone.")
-                        }
-
-                        Divider().padding(.leading, 16)
-
-                        Button { showDeleteDataAlert = true } label: {
-                            SettingsRow(label: "Delete All Data", isDestructive: true, trailing: nil)
-                        }
-                        .buttonStyle(.plain)
-                        .alert("Delete All Data?", isPresented: $showDeleteDataAlert) {
-                            Button("Delete", role: .destructive) {
-                                appState.history.removeAll()
-                                appState.creditManager.resetCredits()
-                            }
-                            Button("Cancel", role: .cancel) {}
-                        } message: {
-                            Text("Your history and credits will be permanently deleted.")
-                        }
+                    // Clear History
+                    Button { showClearHistoryAlert = true } label: {
+                        Text("Clear History")
+                            .font(.system(size: 15))
+                            .foregroundStyle(Color(red: 0.937, green: 0.267, blue: 0.267))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
+                            .overlay(RoundedRectangle(cornerRadius: DS.radiusCard).stroke(Color.hairBorder, lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .alert("Clear History?", isPresented: $showClearHistoryAlert) {
+                        Button("Clear", role: .destructive) { appState.history.removeAll() }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("All past generations will be removed. This cannot be undone.")
                     }
 
                     // Footer

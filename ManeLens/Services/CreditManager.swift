@@ -35,8 +35,13 @@ final class CreditManager {
 
     func loadProducts() async {
         guard products.isEmpty else { return }
-        products = ((try? await Product.products(for: Self.productIDs)) ?? [])
-            .sorted { $0.price < $1.price }
+        do {
+            products = try await Product.products(for: Self.productIDs)
+                .sorted { $0.price < $1.price }
+            print("[CreditManager] Loaded \(products.count) products: \(products.map(\.id))")
+        } catch {
+            print("[CreditManager] loadProducts failed: \(error)")
+        }
     }
 
     // MARK: - Purchase
