@@ -10,7 +10,7 @@ struct ResultView: View {
 
     @State private var liked: Bool? = nil
     @State private var saved = false
-    @State private var exportMessage: String? = nil
+    @State private var saveMessage: String? = nil
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -43,12 +43,8 @@ struct ResultView: View {
 
                         // Action bar
                         HStack(spacing: 0) {
-                            ActionButton(icon: saved ? "checkmark.circle.fill" : "arrow.down.to.line", label: saved ? "Saved" : "Save", active: saved) {
-                                if !saved { exportImage(); saved = true }
-                            }
-                            Divider().frame(height: 40)
-                            ActionButton(icon: "arrow.down.to.line", label: "Export") {
-                                exportImage()
+                            ActionButton(icon: saved ? "checkmark.circle.fill" : "square.and.arrow.down", label: saved ? "Saved" : "Save", active: saved) {
+                                if !saved { saveImage(); saved = true }
                             }
                             Divider().frame(height: 40)
                             ActionButton(icon: "square.and.arrow.up", label: "Share") {
@@ -80,14 +76,14 @@ struct ResultView: View {
             .padding(.top, 20)
             .padding(.bottom, 44)
             .background(
-                LinearGradient(colors: [.white.opacity(0), .white], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.2))
+                LinearGradient(colors: [Color.hairBg.opacity(0), Color.hairBg], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.2))
                     .ignoresSafeArea()
             )
         }
         .background(Color.hairBg)
         .navigationBarHidden(true)
         .overlay(alignment: .bottom) {
-            if let msg = exportMessage {
+            if let msg = saveMessage {
                 Text(msg)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.white)
@@ -99,12 +95,12 @@ struct ResultView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                            withAnimation { exportMessage = nil }
+                            withAnimation { saveMessage = nil }
                         }
                     }
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: exportMessage)
+        .animation(.easeInOut(duration: 0.3), value: saveMessage)
         .overlay(alignment: .top) {
             ScreenNav(title: "Your Preview", onBack: onBack)
                 .background(.ultraThinMaterial)
@@ -143,7 +139,7 @@ struct ResultView: View {
             .present(av, animated: true)
     }
 
-    private func exportImage() {
+    private func saveImage() {
         guard let image = appState.generatedImage else { return }
         Task {
             let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
@@ -151,9 +147,9 @@ struct ResultView: View {
                 switch status {
                 case .authorized, .limited:
                     UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                    exportMessage = "Saved to Photos"
+                    saveMessage = "Saved to Photos"
                 default:
-                    exportMessage = "Allow Photos access in Settings to save images"
+                    saveMessage = "Allow Photos access in Settings to save images"
                 }
             }
         }
@@ -199,7 +195,7 @@ private struct FeedbackButton: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 42)
-            .background(selected ? Color.hairPurpleAlpha : Color.white)
+            .background(selected ? Color.hairPurpleAlpha : Color.hairBg)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(selected ? Color.hairPurple : Color.black.opacity(0.08), lineWidth: 1.5)

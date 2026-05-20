@@ -164,7 +164,8 @@ struct ContentView: View {
 
             appState.generatedImage = result
             if let style { appState.recordGeneration(style: style, original: photo, result: result) }
-            navigate(to: .result(style))
+            // Direct assignment — don't push .generating onto the back stack so Back → styleDetail
+            withAnimation { screen = .result(style) }
 
         } catch is CancellationError {
             // onCancel already refunded — nothing to do here

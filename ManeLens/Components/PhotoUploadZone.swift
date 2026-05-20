@@ -12,9 +12,9 @@ struct PhotoUploadZone: View {
             if let photo {
                 Image(uiImage: photo)
                     .resizable()
-                    .scaledToFill()
-                    .frame(height: 180)
-                    .clipped()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: 280)
+                    .background(Color.hairBgOff)
                     .onTapGesture { onTapPhoto?() }
 
                 VStack {
