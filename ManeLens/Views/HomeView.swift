@@ -21,23 +21,14 @@ struct HomeView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
-                // Header
-                header
-
-                // Search
-                searchBar
-
-                // Category chips
-                categoryChips
-
-                // Style grid
-                styleGrid
-            }
-            .background(Color.hairBg)
-
-            // FAB
+        VStack(spacing: 0) {
+            header
+            searchBar
+            categoryChips
+            styleGrid
+        }
+        .background(Color.hairBg)
+        .safeAreaInset(edge: .bottom) {
             customStyleFAB
         }
     }
@@ -122,9 +113,9 @@ struct HomeView: View {
                 }
             }
             .padding(.horizontal, DS.paddingPage)
-            .padding(.bottom, 110)
+            .padding(.top, 4)
+            .padding(.bottom, 16)
         }
-        .frame(maxHeight: .infinity)
     }
 
     private var customStyleFAB: some View {
@@ -142,6 +133,15 @@ struct HomeView: View {
             .clipShape(Capsule())
             .shadow(color: Color.hairPurple.opacity(0.45), radius: 12, x: 0, y: 6)
         }
-        .padding(.bottom, 40)
+        .padding(.top, 12)
+        .padding(.bottom, 12)
+        .frame(maxWidth: .infinity)
+        .background(
+            LinearGradient(
+                colors: [Color.hairBg.opacity(0), Color.hairBg],
+                startPoint: .top,
+                endPoint: .center
+            )
+        )
     }
 }
