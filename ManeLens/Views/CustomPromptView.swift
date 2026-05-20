@@ -103,27 +103,7 @@ struct CustomPromptView: View {
             }
 
             // Bottom CTA
-            VStack(spacing: 6) {
-                PrimaryButton(
-                    title: "Generate Preview",
-                    icon: "✨",
-                    variant: appState.customPromptText.trimmingCharacters(in: .whitespaces).isEmpty ? .primary : .gradient,
-                    disabled: appState.customPromptText.trimmingCharacters(in: .whitespaces).isEmpty || !appState.hasPhoto,
-                    action: onGenerate
-                )
-                Text(appState.hasPhoto
-                     ? "Uses 1 credit · You have \(appState.credits) remaining"
-                     : "Upload a photo to continue")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.hairTextSec)
-            }
-            .padding(.horizontal, DS.paddingPage)
-            .padding(.top, 20)
-            .padding(.bottom, 44)
-            .background(
-                LinearGradient(colors: [.white.opacity(0), .white], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.15))
-                    .ignoresSafeArea()
-            )
+            bottomCTA
         }
         .background(Color.hairBg)
         .navigationBarHidden(true)
@@ -146,6 +126,28 @@ struct CustomPromptView: View {
                 appState.selectedPhoto = image
             }
         }
+    }
+
+    private var bottomCTA: some View {
+        VStack(spacing: 8) {
+            Divider().opacity(0.4)
+            PrimaryButton(
+                title: "Generate Preview",
+                icon: "✨",
+                variant: appState.customPromptText.trimmingCharacters(in: .whitespaces).isEmpty ? .primary : .gradient,
+                disabled: appState.customPromptText.trimmingCharacters(in: .whitespaces).isEmpty || !appState.hasPhoto,
+                action: onGenerate
+            )
+            Text(appState.hasPhoto
+                 ? "Uses 1 credit · \(appState.credits) remaining"
+                 : "Upload a photo to continue")
+                .font(.system(size: 12))
+                .foregroundStyle(Color.hairTextSec)
+        }
+        .padding(.horizontal, DS.paddingPage)
+        .padding(.top, 10)
+        .padding(.bottom, 24)
+        .background(.regularMaterial)
     }
 }
 

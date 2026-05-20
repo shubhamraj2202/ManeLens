@@ -121,29 +121,25 @@ struct HomeView: View {
     }
 
     private var customStyleFAB: some View {
-        Button(action: onCustom) {
-            HStack(spacing: 8) {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 14, weight: .semibold))
-                Text("Custom Style")
-                    .font(.system(size: 15, weight: .semibold))
+        VStack(spacing: 0) {
+            Divider().opacity(0.4)
+            Button(action: onCustom) {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 16, weight: .semibold))
+                    Text("Create Custom Style")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: DS.buttonHeight)
+                .background(LinearGradient.hairBrand)
+                .clipShape(RoundedRectangle(cornerRadius: DS.radiusButton))
             }
-            .foregroundStyle(.white)
-            .padding(.horizontal, 22)
-            .frame(height: 50)
-            .background(LinearGradient.hairBrand)
-            .clipShape(Capsule())
-            .shadow(color: Color.hairPurple.opacity(0.45), radius: 12, x: 0, y: 6)
+            .padding(.horizontal, DS.paddingPage)
+            .padding(.top, 10)
+            .padding(.bottom, 12)
         }
-        .padding(.top, 12)
-        .padding(.bottom, 12)
-        .frame(maxWidth: .infinity)
-        .background(
-            LinearGradient(
-                colors: [Color.hairBg.opacity(0), Color.hairBg],
-                startPoint: .top,
-                endPoint: .center
-            )
-        )
+        .background(.regularMaterial)
     }
 }

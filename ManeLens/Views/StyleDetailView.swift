@@ -190,37 +190,30 @@ struct StyleDetailView: View {
     // MARK: - Bottom CTA
 
     private var bottomCTA: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
+            Divider().opacity(0.4)
             PrimaryButton(
                 title: "Generate Preview",
                 icon: "✨",
-                variant: .primary,
+                variant: .gradient,
                 disabled: !appState.hasPhoto,
                 action: onGenerate
             )
             Text(appState.hasPhoto
-                 ? "Uses 1 credit · You have \(appState.credits) remaining"
+                 ? "Uses 1 credit · \(appState.credits) remaining"
                  : "Upload a photo to continue")
                 .font(.system(size: 12))
                 .foregroundStyle(Color.hairTextSec)
             Button(action: onCustom) {
                 Text("Try a Custom Style Instead")
-                    .font(.system(size: 14))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.hairPurple)
             }
-            .padding(.top, 2)
         }
         .padding(.horizontal, DS.paddingPage)
-        .padding(.top, 20)
-        .padding(.bottom, 44)
-        .background(
-            LinearGradient(
-                colors: [Color.hairBg.opacity(0), Color.hairBg],
-                startPoint: .top,
-                endPoint: UnitPoint(x: 0.5, y: 0.2)
-            )
-            .ignoresSafeArea()
-        )
+        .padding(.top, 10)
+        .padding(.bottom, 24)
+        .background(.regularMaterial)
     }
 }
 

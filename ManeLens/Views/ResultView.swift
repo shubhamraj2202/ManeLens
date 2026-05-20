@@ -69,16 +69,14 @@ struct ResultView: View {
             }
 
             // Bottom CTA
-            VStack(spacing: 0) {
-                PrimaryButton(title: "Try Another Style", icon: "✂️", variant: .primary, action: onTryAnother)
+            VStack(spacing: 8) {
+                Divider().opacity(0.4)
+                PrimaryButton(title: "Try Another Style", icon: "✂️", variant: .gradient, action: onTryAnother)
             }
             .padding(.horizontal, DS.paddingPage)
-            .padding(.top, 20)
-            .padding(.bottom, 44)
-            .background(
-                LinearGradient(colors: [Color.hairBg.opacity(0), Color.hairBg], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.2))
-                    .ignoresSafeArea()
-            )
+            .padding(.top, 10)
+            .padding(.bottom, 24)
+            .background(.regularMaterial)
         }
         .background(Color.hairBg)
         .navigationBarHidden(true)
