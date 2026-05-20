@@ -96,7 +96,7 @@ struct PaywallView: View {
             .padding(.top, 16)
             .padding(.bottom, 44)
             .background(
-                LinearGradient(colors: [.white.opacity(0), .white], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.3))
+                LinearGradient(colors: [Color.hairBg.opacity(0), Color.hairBg], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.3))
                     .ignoresSafeArea()
             )
         }
@@ -146,7 +146,7 @@ private struct PackCard: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
-                .background(selected ? Color.hairPurpleAlpha : Color.hairBg)
+                .background(selected ? Color.hairPurpleAlpha : Color.hairBgOff)
                 .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
                 .overlay(
                     RoundedRectangle(cornerRadius: DS.radiusCard)
