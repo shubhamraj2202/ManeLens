@@ -247,7 +247,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-20
-**Current State:** SESSION 13 COMPLETE — UI polish, iCloud KV backup, Edit custom styles, crash fix, logo update. Build succeeds cleanly.
+**Current State:** SESSION 14 COMPLETE — Fixed TestFlight install issue by lowering `IPHONEOS_DEPLOYMENT_TARGET` from `26.0` to `18.0`. Added documentation about Xcode Cloud build numbering. Build succeeds cleanly.
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
