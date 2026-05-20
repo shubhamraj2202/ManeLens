@@ -286,7 +286,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 
 CODE FIXES (new bugs found in Session 11 device testing):
 1. **StyleDetailView hero face cut off** — hero uses `.ignoresSafeArea(edges: .top)` + opaque white nav bar overlay; nav bar covers ~110pt of the 16:9 hero so only the person's collar/chest shows. Fix: remove `.ignoresSafeArea(edges: .top)`, place nav bar in normal VStack flow, let hero start below nav bar. File: `StyleDetailView.swift`
-2. **HomeView style card category label** — user wants category chip ("Wedding", "Casual") centered and prominent at the TOP of each card, not small pill top-left. Fix: move category label to a centered badge at the top of the card. File: `StyleCardView.swift`
+2. **HomeView style card label alignment** — category chip must be exactly at TOP-LEFT corner, NEW badge exactly at TOP-RIGHT corner. Currently NEW badge drifts toward center-left when no category is long enough to push the Spacer. Fix: ensure HStack Spacer correctly separates the two; use `.frame(maxWidth: .infinity, alignment: .leading)` on category side. File: `StyleCardView.swift`
 
 CONTENT (once Gemini images are ready):
 3. Add remaining 23 sample PNGs (female styles) to Assets.xcassets imagesets + populate sampleImages arrays in HairStyle.swift — see prompt in session notes
@@ -311,10 +311,11 @@ VStack(spacing: 0) {
 // heroArea aspect ratio: change 16/9 → 4/3 to show more of the face
 ```
 
-**StyleCardView category label fix — desired UX:**
-- Category text ("Wedding", "Salon") as a centered pill badge at the very TOP of the card
-- Style name stays at bottom-left as before
-- Remove the small top-left pill, replace with centered top badge
+**StyleCardView label fix — desired UX:**
+- Category chip ("Wedding", "Salon"): exactly at TOP-LEFT corner, tight to edge
+- NEW badge: exactly at TOP-RIGHT corner, tight to edge
+- Style name: stays at bottom-left as before
+- Both badges in the same HStack row with a Spacer between them
 
 **Legal URLs (already wired in SettingsView.swift, just need HTML pages):**
 - Privacy: https://shubhamraj2202.github.io/hairLens-privacy.html
