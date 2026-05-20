@@ -282,40 +282,66 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 - All showing "Missing Metadata" — need: price tier + English localization + review screenshot per IAP
 - Products DO load on real device even in Missing Metadata state (sandbox)
 
-**PENDING BEFORE SUBMISSION:**
-- Create remaining 23 images/11 styles once the 4h38m Gemini Imagen quota block is lifted.
-- Create `hairLens-privacy.html` on https://github.com/shubhamraj2202/shubhamraj2202.github.io (model after veggieLens-privacy.html)
-- Create `hairLens-terms.html` (model after veggieLens-terms.html)
-- Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
-- App Store screenshots — 6 screens at 1320×2868 (6.9") and 1179×2556 (6.3")
-- Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
-- Add app to App Store version page + attach IAPs to version before submitting
+**PENDING BEFORE SUBMISSION — Session 12:**
 
-**Legal URLs (once pages created):**
+CODE FIXES (new bugs found in Session 11 device testing):
+1. **StyleDetailView hero face cut off** — hero uses `.ignoresSafeArea(edges: .top)` + opaque white nav bar overlay; nav bar covers ~110pt of the 16:9 hero so only the person's collar/chest shows. Fix: remove `.ignoresSafeArea(edges: .top)`, place nav bar in normal VStack flow, let hero start below nav bar. File: `StyleDetailView.swift`
+2. **HomeView style card category label** — user wants category chip ("Wedding", "Casual") centered and prominent at the TOP of each card, not small pill top-left. Fix: move category label to a centered badge at the top of the card. File: `StyleCardView.swift`
+
+CONTENT (once Gemini images are ready):
+3. Add remaining 23 sample PNGs (female styles) to Assets.xcassets imagesets + populate sampleImages arrays in HairStyle.swift — see prompt in session notes
+4. Create `hairLens-privacy.html` on https://github.com/shubhamraj2202/shubhamraj2202.github.io
+5. Create `hairLens-terms.html`
+6. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
+7. App Store screenshots — 1320×2868 (6.9") and 1179×2556 (6.3")
+8. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
+
+**StyleDetailView hero fix — root cause:**
+```swift
+// Current (broken): ScrollView ignores safe area, nav bar overlay is opaque white
+ScrollView { VStack { heroArea ... } }
+    .ignoresSafeArea(edges: .top)
+.overlay(alignment: .top) { navBar.background(Color.hairBg) }
+
+// Fix: normal VStack layout, nav bar first, hero below
+VStack(spacing: 0) {
+    navBar  // positioned naturally, no overlay
+    ScrollView { VStack { heroArea ... } }
+}
+// heroArea aspect ratio: change 16/9 → 4/3 to show more of the face
+```
+
+**StyleCardView category label fix — desired UX:**
+- Category text ("Wedding", "Salon") as a centered pill badge at the very TOP of the card
+- Style name stays at bottom-left as before
+- Remove the small top-left pill, replace with centered top badge
+
+**Legal URLs (already wired in SettingsView.swift, just need HTML pages):**
 - Privacy: https://shubhamraj2202.github.io/hairLens-privacy.html
 - Terms: https://shubhamraj2202.github.io/hairLens-terms.html
-- These are already set in SettingsView.swift — just need the HTML pages created
 
-**Complete Bug List from Sessions 8–10 (for reference):**
+**Complete Bug List from Sessions 8–11:**
 | # | View | Bug | Status |
 |---|------|-----|--------|
-| 1 | ResultView | "scissors" renders as text (not SF symbol) | FIXED ✅ |
-| 2 | ResultView | Share button duplicated in nav + action bar | FIXED ✅ |
-| 3 | ResultView | Slider aspect ratio crops face | FIXED ✅ |
-| 4 | ResultView | Save button did nothing | FIXED ✅ (saves to Photos) |
-| 5 | ResultView | "Love it" did nothing | FIXED ✅ (App Store review) |
-| 6 | StyleDetailView | Nav bar dark over hero image | FIXED ✅ |
-| 7 | CustomPromptView | Header hidden under nav bar | FIXED ✅ |
-| 8 | PaywallView | Large empty gap below pack cards | FIXED ✅ |
-| 9 | SettingsView | Non-functional toggles (Appearance/Haptic) | FIXED ✅ (removed) |
-| 10 | SettingsView | Danger Zone confusing | FIXED ✅ (simplified) |
-| 11 | HomeView | Grid not scrollable | FIXED ✅ (ScrollView already wrapped LazyVGrid) |
-| 12 | HomeView | No Male/Female filter | FIXED ✅ (gender field + filter chips) |
-| 13 | HistoryView | No delete/clear all | FIXED ✅ (Edit mode + toolbar) |
-| 14 | StyleDetailView | Tap photo → re-opens picker not fullscreen | FIXED ✅ (onTapPhoto → fullscreen sheet) |
-| 15 | All style cards | Illustration instead of real sample photos | PARTIALLY DONE ✅ (9 styles fully mapped, 11 style fallbacks working seamlessly) |
+| 1 | ResultView | "scissors" renders as text | FIXED ✅ |
+| 2 | ResultView | Share button duplicated | FIXED ✅ |
+| 3 | ResultView | Slider crops face | FIXED ✅ |
+| 4 | ResultView | Save button did nothing | FIXED ✅ |
+| 5 | ResultView | "Love it" did nothing | FIXED ✅ |
+| 6 | StyleDetailView | Nav bar dark over hero | FIXED ✅ |
+| 7 | CustomPromptView | Header hidden | FIXED ✅ |
+| 8 | PaywallView | Empty gap below cards | FIXED ✅ |
+| 9 | SettingsView | Non-functional toggles | FIXED ✅ |
+| 10 | SettingsView | Danger Zone confusing | FIXED ✅ |
+| 11 | HomeView | Grid not scrollable | FIXED ✅ |
+| 12 | HomeView | No Male/Female filter | FIXED ✅ |
+| 13 | HistoryView | No delete/clear all | FIXED ✅ |
+| 14 | StyleDetailView | Tap photo re-opens picker | FIXED ✅ |
+| 15 | StyleCards | No real sample photos | PARTIAL ✅ (9 male styles done, 11 female pending images) |
+| 16 | StyleDetailView | Hero face cut off by nav bar | PENDING ⏳ |
+| 17 | HomeView | Category chip small/top-left on card | PENDING ⏳ |
 
-**Next Step:** Complete the remaining 23 images/11 styles once the 4h38m Gemini Imagen quota block resets, publish the web privacy/terms pages, and submit the build.
+**Next Step:** Session 12 — fix bugs #16 + #17, add female sample images when Gemini delivers them, then TestFlight.
 
 
 ---
