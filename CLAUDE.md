@@ -246,7 +246,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-20
-**Current State:** SESSION 11 IN PROGRESS — The `HairStyle.swift` catalog is now 100% updated with all 40 asset mapping names. 17 photorealistic high-quality assets have been fully generated, processed, and integrated across 9 main styles. The remaining 23 images/11 styles default safely and elegantly to the native `HairFaceView` vector fallback illustrations until the Gemini Imagen 429 quota block resets (in ~4h 31m). The Xcode project builds 100% successfully.
+**Current State:** SESSION 12 COMPLETE — Bug #16 (StyleDetailView hero face cut off) and Bug #17 (StyleCardView badge alignment) fixed. Dark/Light/System theme toggle added. Build succeeds cleanly.
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
@@ -254,10 +254,11 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 - StoreKit purchase flow works on device with sandbox account
 - PaywallView: all 4 packs showing, safeAreaInset bottom CTA, no empty gap
 - ResultView: before/after slider 4/5 portrait ratio, ✂️ emoji, Save→exportToPhotos, Love it→AppStore review, share removed from nav
-- SettingsView: cleaned up — removed non-functional Appearance/Haptic toggles, removed Danger Zone, Privacy/Terms point to GitHub Pages URLs, removed Clear History (moved to HistoryView)
+- SettingsView: Appearance section with System/Light/Dark segmented theme picker; Privacy/Terms → GitHub Pages URLs
 - CustomPromptView: header padding fixed (56pt top)
-- StyleDetailView: nav bar solid white background, swipeable sample image carousel (with dynamic xcasset/HairFaceView fallback), fullscreen tap on carousel images, tapping loaded photo shows fullscreen preview not picker
-- StyleCardView: shows first sample image when assets available, HairFaceView fallback
+- StyleDetailView: navBar in VStack flow (face fully visible in hero, 4:3 ratio), swipeable carousel, fullscreen tap, photo preview
+- StyleCardView: category chip exactly top-left, NEW badge exactly top-right (frame maxWidth/maxHeight fix)
+- Theme: ThemeMode enum in AppState (persisted UserDefaults), `.preferredColorScheme()` on root; all design system colors now UIColor adaptive (systemBackground, label, separator, etc.)
 - HomeView: Male/Female filter chips alongside category chips
 - HistoryView: Edit mode with multi-select, "Delete (N)" + "Clear All" toolbar buttons
 - HairStyle catalog: 20 styles (6 original + 14 new) with gender field — Male/Female/Unisex
@@ -339,10 +340,17 @@ VStack(spacing: 0) {
 | 13 | HistoryView | No delete/clear all | FIXED ✅ |
 | 14 | StyleDetailView | Tap photo re-opens picker | FIXED ✅ |
 | 15 | StyleCards | No real sample photos | PARTIAL ✅ (9 male styles done, 11 female pending images) |
-| 16 | StyleDetailView | Hero face cut off by nav bar | PENDING ⏳ |
-| 17 | HomeView | Category chip small/top-left on card | PENDING ⏳ |
+| 16 | StyleDetailView | Hero face cut off by nav bar | FIXED ✅ |
+| 17 | StyleCardView | Badge alignment (category top-left, NEW top-right) | FIXED ✅ |
 
-**Next Step:** Session 12 — fix bugs #16 + #17, add female sample images when Gemini delivers them, then TestFlight.
+**PENDING BEFORE SUBMISSION — Session 13:**
+1. Add remaining 23 sample PNGs (female styles) to Assets.xcassets + populate sampleImages in HairStyle.swift
+2. Create `hairLens-privacy.html` + `hairLens-terms.html` on shubhamraj2202.github.io
+3. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
+4. App Store screenshots — 1320×2868 (6.9") and 1179×2556 (6.3")
+5. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
+
+**Next Step:** Session 13 — add female sample images when Gemini delivers them, then TestFlight.
 
 
 ---
