@@ -151,10 +151,14 @@ struct ContentView: View {
         }
 
         do {
+            // For user-saved custom styles, the prompt rides on the style itself.
+            let effectiveStyleKey: String? = (style?.isCustom == true) ? nil : style?.styleKey
+            let effectiveCustomPrompt: String? = style?.customPrompt
+                ?? (appState.customPromptText.isEmpty ? nil : appState.customPromptText)
             let result = try await APIClient.generate(
                 photo: photo,
-                styleKey: style?.styleKey,
-                customPrompt: appState.customPromptText.isEmpty ? nil : appState.customPromptText
+                styleKey: effectiveStyleKey,
+                customPrompt: effectiveCustomPrompt
             )
 
             guard !Task.isCancelled else {

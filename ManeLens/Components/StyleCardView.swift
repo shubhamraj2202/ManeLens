@@ -44,18 +44,16 @@ struct StyleCardView: View {
                     Spacer()
                 }
 
-                // Style name at bottom
+                // Style name at bottom — centered
                 VStack {
                     Spacer()
-                    HStack {
-                        Text(style.name)
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.bottom, 10)
+                    Text(style.name)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 10)
+                        .padding(.bottom, 10)
                 }
             }
         }

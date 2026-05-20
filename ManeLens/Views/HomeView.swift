@@ -11,13 +11,28 @@ struct HomeView: View {
     @State private var selectedCategory = "All"
     @State private var searchText = ""
 
+    private var allStyles: [HairStyle] {
+        HairStyle.catalog + appState.customStyles
+    }
+
     private var filteredStyles: [HairStyle] {
-        HairStyle.catalog.filter { style in
-            (selectedCategory == "All"
-                || style.category == selectedCategory
-                || style.gender == selectedCategory) &&
-            (searchText.isEmpty || style.name.localizedCaseInsensitiveContains(searchText))
+        allStyles.filter { style in
+            let matchesCategory: Bool
+            switch selectedCategory {
+            case "All":       matchesCategory = true
+            case "Favorites": matchesCategory = appState.isFavorite(style.id)
+            case "Custom":    matchesCategory = style.isCustom
+            default:          matchesCategory = style.category == selectedCategory || style.gender == selectedCategory
+            }
+            let matchesSearch = searchText.isEmpty || style.name.localizedCaseInsensitiveContains(searchText)
+            return matchesCategory && matchesSearch
         }
+    }
+
+    private var categories: [String] {
+        var base = ["Favorites", "All", "Male", "Female", "Wedding", "Salon", "Casual", "Bold"]
+        if !appState.customStyles.isEmpty { base.append("Custom") }
+        return base
     }
 
     var body: some View {
@@ -93,7 +108,7 @@ struct HomeView: View {
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(HairStyle.categories, id: \.self) { cat in
+                ForEach(categories, id: \.self) { cat in
                     CategoryChip(label: cat, selected: selectedCategory == cat) {
                         selectedCategory = cat
                     }

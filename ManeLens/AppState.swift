@@ -42,12 +42,52 @@ class AppState {
         didSet { HistoryStore.shared.save(history) }
     }
 
+    var customStyles: [HairStyle] = [] {
+        didSet { CustomStylesStore.shared.save(customStyles) }
+    }
+
     init() {
         self.history = HistoryStore.shared.load()
+        self.customStyles = CustomStylesStore.shared.load()
+    }
+
+    func saveCustomStyle(name: String, prompt: String) {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPrompt = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty, !trimmedPrompt.isEmpty else { return }
+        let style = HairStyle(
+            id: CustomStylesStore.shared.nextID(),
+            name: trimmedName,
+            category: "Custom",
+            gender: "Unisex",
+            hairColor: Color(red: 0.486, green: 0.227, blue: 0.929),
+            gradientColors: [
+                Color(red: 0.122, green: 0.063, blue: 0.235),
+                Color(red: 0.298, green: 0.157, blue: 0.596),
+                Color(red: 0.925, green: 0.286, blue: 0.600),
+            ],
+            description: trimmedPrompt,
+            styleKey: "",
+            customPrompt: trimmedPrompt
+        )
+        customStyles.append(style)
+    }
+
+    func deleteCustomStyle(id: Int) {
+        customStyles.removeAll { $0.id == id }
     }
 
     var themeMode: ThemeMode = ThemeMode(rawValue: UserDefaults.standard.string(forKey: "hairlens_theme") ?? "system") ?? .system {
         didSet { UserDefaults.standard.set(themeMode.rawValue, forKey: "hairlens_theme") }
+    }
+
+    var favorites: Set<Int> = Set(UserDefaults.standard.array(forKey: "hairlens_favorites") as? [Int] ?? []) {
+        didSet { UserDefaults.standard.set(Array(favorites), forKey: "hairlens_favorites") }
+    }
+
+    func isFavorite(_ id: Int) -> Bool { favorites.contains(id) }
+    func toggleFavorite(_ id: Int) {
+        if favorites.contains(id) { favorites.remove(id) } else { favorites.insert(id) }
     }
 
     var credits: Int { creditManager.credits }

@@ -6,9 +6,17 @@ struct CustomPromptView: View {
     var onGenerate: () -> Void
 
     @State private var showPicker = false
+    @State private var styleName: String = ""
+    @State private var savedToast: String? = nil
 
     private let chips = ["Long & wavy", "Short & textured", "Bold color", "Vintage", "Editorial", "Curly"]
     private let maxLength = 200
+    private let maxNameLength = 30
+
+    private var canSave: Bool {
+        !styleName.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !appState.customPromptText.trimmingCharacters(in: .whitespaces).isEmpty
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -22,6 +30,29 @@ struct CustomPromptView: View {
                         Text("Be specific — length, color, texture, vibe")
                             .font(.system(size: 14))
                             .foregroundStyle(Color.hairTextSec)
+                    }
+
+                    // Style Name input
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Style Name")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Color.hairText)
+                        TextField("e.g. 'My beach vibe'", text: $styleName)
+                            .font(.system(size: 15))
+                            .foregroundStyle(Color.hairText)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 12)
+                            .background(Color.hairPurpleLight)
+                            .clipShape(RoundedRectangle(cornerRadius: DS.radiusInput))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: DS.radiusInput)
+                                    .stroke(Color.hairPurple.opacity(0.2), lineWidth: 1.5)
+                            )
+                            .onChange(of: styleName) { _, new in
+                                if new.count > maxNameLength {
+                                    styleName = String(new.prefix(maxNameLength))
+                                }
+                            }
                     }
 
                     // Text area — bound directly to appState so ContentView can read it
@@ -58,6 +89,23 @@ struct CustomPromptView: View {
                         RoundedRectangle(cornerRadius: DS.radiusInput)
                             .stroke(Color.hairPurple.opacity(0.2), lineWidth: 1.5)
                     )
+
+                    // Save Style — saves the template (without generating)
+                    Button(action: saveCustomStyle) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "bookmark.fill")
+                                .font(.system(size: 14, weight: .semibold))
+                            Text("Save to My Styles")
+                                .font(.system(size: 14, weight: .semibold))
+                        }
+                        .foregroundStyle(canSave ? Color.hairPurple : Color.hairTextSec)
+                        .padding(.horizontal, 16)
+                        .frame(height: 38)
+                        .background(canSave ? Color.hairPurpleAlpha : Color.black.opacity(0.05))
+                        .overlay(Capsule().stroke(canSave ? Color.hairPurple.opacity(0.3) : Color.clear, lineWidth: 1))
+                        .clipShape(Capsule())
+                    }
+                    .disabled(!canSave)
 
                     // Quick chips
                     FlowLayout(spacing: 8) {
@@ -126,6 +174,33 @@ struct CustomPromptView: View {
                 appState.selectedPhoto = image
             }
         }
+        .overlay(alignment: .bottom) {
+            if let msg = savedToast {
+                Text(msg)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color.black.opacity(0.75))
+                    .clipShape(Capsule())
+                    .padding(.bottom, 140)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            withAnimation { savedToast = nil }
+                        }
+                    }
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: savedToast)
+    }
+
+    private func saveCustomStyle() {
+        guard canSave else { return }
+        appState.saveCustomStyle(name: styleName, prompt: appState.customPromptText)
+        savedToast = "Saved to My Styles"
+        styleName = ""
+        appState.customPromptText = ""
     }
 
     private var bottomCTA: some View {

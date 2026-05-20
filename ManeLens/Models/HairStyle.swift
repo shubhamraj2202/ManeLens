@@ -11,6 +11,9 @@ struct HairStyle: Identifiable, Hashable {
     let styleKey: String
     var isNew: Bool = false
     var sampleImages: [String] = []  // Asset names; falls back to HairFaceView when empty
+    var customPrompt: String? = nil  // set for user-saved custom styles; uses prompt instead of styleKey
+
+    var isCustom: Bool { customPrompt != nil }
 
     static func == (lhs: HairStyle, rhs: HairStyle) -> Bool { lhs.id == rhs.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }

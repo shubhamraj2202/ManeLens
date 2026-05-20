@@ -7,7 +7,6 @@ struct StyleDetailView: View {
     var onGenerate: () -> Void
     var onCustom: () -> Void
 
-    @State private var isFavorited = false
     @State private var tipsExpanded = false
     @State private var showPicker = false
     @State private var carouselPage = 0
@@ -134,10 +133,10 @@ struct StyleDetailView: View {
             title: style.name,
             onBack: onBack,
             trailing: AnyView(
-                Button(action: { isFavorited.toggle() }) {
-                    Image(systemName: isFavorited ? "heart.fill" : "heart")
+                Button(action: { appState.toggleFavorite(style.id) }) {
+                    Image(systemName: appState.isFavorite(style.id) ? "heart.fill" : "heart")
                         .font(.system(size: 20))
-                        .foregroundStyle(isFavorited ? Color.hairPink : Color.hairText)
+                        .foregroundStyle(appState.isFavorite(style.id) ? Color.hairPink : Color.hairText)
                 }
             )
         )
