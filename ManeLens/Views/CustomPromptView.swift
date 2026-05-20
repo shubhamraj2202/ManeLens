@@ -130,6 +130,7 @@ struct CustomPromptView: View {
                                                 .frame(width: 72, height: 72)
                                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                                             Button {
+                                                guard idx < sampleImages.count else { return }
                                                 sampleImages.remove(at: idx)
                                                 if idx < sampleImagePickerItems.count {
                                                     sampleImagePickerItems.remove(at: idx)
