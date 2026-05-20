@@ -23,8 +23,14 @@ final class HistoryStore {
         try? FileManager.default.createDirectory(at: imagesDir, withIntermediateDirectories: true)
     }
 
+    private static let iCloudKey = "hairlens_history_v1"
+
     func load() -> [GenerationRecord] {
-        guard let data = try? Data(contentsOf: metaURL),
+        let localData = try? Data(contentsOf: metaURL)
+        let cloudData = localData == nil
+            ? NSUbiquitousKeyValueStore.default.data(forKey: Self.iCloudKey)
+            : nil
+        guard let data = localData ?? cloudData,
               let persisted = try? JSONDecoder().decode([Persisted].self, from: data) else {
             return []
         }
@@ -49,6 +55,8 @@ final class HistoryStore {
         }
         if let data = try? JSONEncoder().encode(persisted) {
             try? data.write(to: metaURL, options: .atomic)
+            NSUbiquitousKeyValueStore.default.set(data, forKey: Self.iCloudKey)
+            NSUbiquitousKeyValueStore.default.synchronize()
         }
 
         for record in records {

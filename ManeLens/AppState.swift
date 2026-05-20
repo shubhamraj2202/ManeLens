@@ -110,8 +110,17 @@ class AppState {
         didSet { UserDefaults.standard.set(themeMode.rawValue, forKey: "hairlens_theme") }
     }
 
-    var favorites: Set<Int> = Set(UserDefaults.standard.array(forKey: "hairlens_favorites") as? [Int] ?? []) {
-        didSet { UserDefaults.standard.set(Array(favorites), forKey: "hairlens_favorites") }
+    var favorites: Set<Int> = {
+        let kvArr = NSUbiquitousKeyValueStore.default.array(forKey: "hairlens_favorites_v1") as? [Int]
+        let udArr = UserDefaults.standard.array(forKey: "hairlens_favorites") as? [Int]
+        return Set(kvArr ?? udArr ?? [])
+    }() {
+        didSet {
+            let arr = Array(favorites)
+            UserDefaults.standard.set(arr, forKey: "hairlens_favorites")
+            NSUbiquitousKeyValueStore.default.set(arr, forKey: "hairlens_favorites_v1")
+            NSUbiquitousKeyValueStore.default.synchronize()
+        }
     }
 
     func isFavorite(_ id: Int) -> Bool { favorites.contains(id) }
