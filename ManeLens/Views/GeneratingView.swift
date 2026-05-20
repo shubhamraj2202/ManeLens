@@ -19,10 +19,7 @@ struct GeneratingView: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                colors: [
-                    Color(red: 0.980, green: 0.980, blue: 1.000),
-                    Color.hairPurpleLight,
-                ],
+                colors: [Color.hairBg, Color.hairPurpleLight],
                 startPoint: .top,
                 endPoint: .bottom
             )

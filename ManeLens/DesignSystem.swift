@@ -8,8 +8,18 @@ extension Color {
     static let hairTextSec     = Color(UIColor.secondaryLabel)                   // adaptive
     static let hairBg          = Color(UIColor.systemBackground)                 // adaptive
     static let hairBgOff       = Color(UIColor.secondarySystemBackground)        // adaptive
-    static let hairPurpleLight = Color(red: 0.961, green: 0.953, blue: 1.000)   // #F5F3FF — brand tint
-    static let hairPurpleAlpha = Color(red: 0.486, green: 0.227, blue: 0.929).opacity(0.10)
+    // Adaptive: light purple tint in light mode, dark purple tint in dark mode
+    static let hairPurpleLight = Color(UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(red: 0.18, green: 0.13, blue: 0.29, alpha: 1.0)   // dark purple
+            : UIColor(red: 0.961, green: 0.953, blue: 1.000, alpha: 1.0) // #F5F3FF
+    })
+    // Adaptive: purple-on-white tint vs purple-on-dark tint
+    static let hairPurpleAlpha = Color(UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(red: 0.486, green: 0.227, blue: 0.929, alpha: 0.22)
+            : UIColor(red: 0.486, green: 0.227, blue: 0.929, alpha: 0.10)
+    })
     static let hairBorder      = Color(UIColor.separator)                        // adaptive
 }
 

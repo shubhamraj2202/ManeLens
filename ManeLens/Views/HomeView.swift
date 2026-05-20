@@ -27,6 +27,7 @@ struct HomeView: View {
             categoryChips
             styleGrid
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.hairBg)
         .safeAreaInset(edge: .bottom) {
             customStyleFAB
