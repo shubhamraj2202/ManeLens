@@ -123,9 +123,13 @@ struct HomeView: View {
         ScrollView(showsIndicators: false) {
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
                 ForEach(filteredStyles) { style in
-                    StyleCardView(style: style) {
-                        onStyleSelect(style)
-                    }
+                    StyleCardView(
+                        style: style,
+                        action: { onStyleSelect(style) },
+                        isFavorited: appState.isFavorite(style.id),
+                        onFavoriteToggle: { appState.toggleFavorite(style.id) },
+                        onDelete: style.isCustom ? { appState.deleteCustomStyle(id: style.id) } : nil
+                    )
                 }
             }
             .padding(.horizontal, DS.paddingPage)

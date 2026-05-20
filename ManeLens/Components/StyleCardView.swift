@@ -3,6 +3,9 @@ import SwiftUI
 struct StyleCardView: View {
     let style: HairStyle
     let action: () -> Void
+    var isFavorited: Bool = false
+    var onFavoriteToggle: (() -> Void)? = nil
+    var onDelete: (() -> Void)? = nil
 
     var body: some View {
         Button(action: action) {
@@ -61,6 +64,21 @@ struct StyleCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
         .shadow(color: .black.opacity(0.14), radius: 7, x: 0, y: 2)
         .buttonStyle(StyleCardButtonStyle())
+        .contextMenu {
+            if let onFavoriteToggle {
+                Button(action: onFavoriteToggle) {
+                    Label(
+                        isFavorited ? "Remove from Favorites" : "Add to Favorites",
+                        systemImage: isFavorited ? "heart.slash" : "heart"
+                    )
+                }
+            }
+            if let onDelete {
+                Button(role: .destructive, action: onDelete) {
+                    Label("Delete Style", systemImage: "trash")
+                }
+            }
+        }
     }
 
     @ViewBuilder

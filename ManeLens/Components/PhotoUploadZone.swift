@@ -13,7 +13,7 @@ struct PhotoUploadZone: View {
                 Image(uiImage: photo)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: 280)
+                    .frame(maxWidth: .infinity, maxHeight: 240)
                     .background(Color.hairBgOff)
                     .onTapGesture { onTapPhoto?() }
 
@@ -52,7 +52,7 @@ struct PhotoUploadZone: View {
                         .foregroundStyle(Color.hairTextSec)
                 }
                 .frame(maxWidth: .infinity)
-                .frame(height: 180)
+                .frame(height: 240)
                 .contentShape(Rectangle())
                 .onTapGesture(perform: onTap)
             }
