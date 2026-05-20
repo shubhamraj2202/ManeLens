@@ -5,6 +5,7 @@ enum Screen {
     case home
     case styleDetail(HairStyle)
     case customPrompt
+    case editCustomStyle(HairStyle)
     case generating(HairStyle?)
     case result(HairStyle?)
     case history
@@ -36,6 +37,7 @@ struct ContentView: View {
                     appState: appState,
                     onStyleSelect: { style in navigate(to: .styleDetail(style)) },
                     onCustom: { navigate(to: .customPrompt) },
+                    onEdit: { style in navigate(to: .editCustomStyle(style)) },
                     onSettings: { navigate(to: .settings) },
                     onHistory: { navigate(to: .history) },
                     onPaywall: { navigate(to: .paywall) }
@@ -73,6 +75,23 @@ struct ContentView: View {
                             navigate(to: .paywall)
                         }
                     }
+                )
+                .transition(.move(edge: .trailing))
+
+            case .editCustomStyle(let style):
+                CustomPromptView(
+                    appState: appState,
+                    onBack: { navigateBack() },
+                    onGenerate: {
+                        guard appState.hasPhoto else { return }
+                        if appState.credits > 0 {
+                            appState.consumeCredit()
+                            navigate(to: .generating(style))
+                        } else {
+                            navigate(to: .paywall)
+                        }
+                    },
+                    editingStyle: style
                 )
                 .transition(.move(edge: .trailing))
 
@@ -206,7 +225,8 @@ struct ContentView: View {
         case .onboarding:           return "onboarding"
         case .home:                 return "home"
         case .styleDetail(let s):   return "detail-\(s.id)"
-        case .customPrompt:         return "custom"
+        case .customPrompt:                 return "custom"
+        case .editCustomStyle(let s):       return "edit-\(s.id)"
         case .generating:           return "generating"
         case .result:               return "result"
         case .history:              return "history"

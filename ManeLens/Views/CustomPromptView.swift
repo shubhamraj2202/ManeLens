@@ -5,6 +5,7 @@ struct CustomPromptView: View {
     @Bindable var appState: AppState
     var onBack: () -> Void
     var onGenerate: () -> Void
+    var editingStyle: HairStyle? = nil
 
     @State private var showPicker = false
     @State private var styleName: String = ""
@@ -154,7 +155,7 @@ struct CustomPromptView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "bookmark.fill")
                                 .font(.system(size: 14, weight: .semibold))
-                            Text("Save to My Styles")
+                            Text("Save to Custom Styles")
                                 .font(.system(size: 14, weight: .semibold))
                         }
                         .foregroundStyle(canSave ? Color.hairPurple : Color.hairTextSec)
@@ -214,9 +215,16 @@ struct CustomPromptView: View {
         }
         .background(Color.hairBg)
         .navigationBarHidden(true)
+        .onAppear {
+            if let s = editingStyle {
+                styleName = s.name
+                appState.customPromptText = s.customPrompt ?? ""
+                sampleImages = s.sampleImages.compactMap { UIImage(contentsOfFile: $0) }
+            }
+        }
         .overlay(alignment: .top) {
             ScreenNav(
-                title: "Custom Style",
+                title: editingStyle == nil ? "Custom Style" : "Edit Style",
                 onBack: onBack,
                 trailing: AnyView(
                     Button(action: onBack) {
@@ -268,12 +276,17 @@ struct CustomPromptView: View {
 
     private func saveCustomStyle() {
         guard canSave else { return }
-        appState.saveCustomStyle(name: styleName, prompt: appState.customPromptText, sampleImages: sampleImages)
-        savedToast = "Saved to My Styles"
-        styleName = ""
-        appState.customPromptText = ""
-        sampleImages = []
-        sampleImagePickerItems = []
+        if let s = editingStyle {
+            appState.updateCustomStyle(id: s.id, name: styleName, prompt: appState.customPromptText, sampleImages: sampleImages)
+            savedToast = "Style Updated"
+        } else {
+            appState.saveCustomStyle(name: styleName, prompt: appState.customPromptText, sampleImages: sampleImages)
+            savedToast = "Saved to My Styles"
+            styleName = ""
+            appState.customPromptText = ""
+            sampleImages = []
+            sampleImagePickerItems = []
+        }
     }
 
     private var bottomCTA: some View {

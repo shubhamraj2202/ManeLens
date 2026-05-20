@@ -4,6 +4,7 @@ struct HomeView: View {
     @Bindable var appState: AppState
     var onStyleSelect: (HairStyle) -> Void
     var onCustom: () -> Void
+    var onEdit: (HairStyle) -> Void
     var onSettings: () -> Void
     var onHistory: () -> Void
     var onPaywall: () -> Void
@@ -128,6 +129,7 @@ struct HomeView: View {
                         action: { onStyleSelect(style) },
                         isFavorited: appState.isFavorite(style.id),
                         onFavoriteToggle: { appState.toggleFavorite(style.id) },
+                        onEdit: style.isCustom ? { onEdit(style) } : nil,
                         onDelete: style.isCustom ? { appState.deleteCustomStyle(id: style.id) } : nil
                     )
                 }

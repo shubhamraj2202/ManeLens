@@ -5,6 +5,7 @@ struct StyleCardView: View {
     let action: () -> Void
     var isFavorited: Bool = false
     var onFavoriteToggle: (() -> Void)? = nil
+    var onEdit: (() -> Void)? = nil
     var onDelete: (() -> Void)? = nil
 
     var body: some View {
@@ -60,22 +61,24 @@ struct StyleCardView: View {
                 }
             }
         }
-        .frame(height: 165)
+        .frame(height: 190)
         .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
         .shadow(color: .black.opacity(0.14), radius: 7, x: 0, y: 2)
         .buttonStyle(StyleCardButtonStyle())
         .contextMenu {
             if let onFavoriteToggle {
                 Button(action: onFavoriteToggle) {
-                    Label(
-                        isFavorited ? "Remove from Favorites" : "Add to Favorites",
-                        systemImage: isFavorited ? "heart.slash" : "heart"
-                    )
+                    Label(isFavorited ? "Unfavorite" : "Favorite", systemImage: isFavorited ? "heart.slash" : "heart")
+                }
+            }
+            if let onEdit {
+                Button(action: onEdit) {
+                    Label("Edit", systemImage: "pencil")
                 }
             }
             if let onDelete {
                 Button(role: .destructive, action: onDelete) {
-                    Label("Delete Style", systemImage: "trash")
+                    Label("Delete", systemImage: "trash")
                 }
             }
         }

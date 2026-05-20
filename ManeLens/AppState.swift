@@ -84,6 +84,28 @@ class AppState {
         favorites.remove(id)
     }
 
+    func updateCustomStyle(id: Int, name: String, prompt: String, sampleImages: [UIImage] = []) {
+        guard let idx = customStyles.firstIndex(where: { $0.id == id }) else { return }
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPrompt = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty, !trimmedPrompt.isEmpty else { return }
+        CustomStylesStore.shared.deleteSampleImages(for: id)
+        let imagePaths = sampleImages.isEmpty ? [] : CustomStylesStore.shared.saveSampleImages(sampleImages, for: id)
+        let existing = customStyles[idx]
+        customStyles[idx] = HairStyle(
+            id: id,
+            name: trimmedName,
+            category: "Custom",
+            gender: "Unisex",
+            hairColor: existing.hairColor,
+            gradientColors: existing.gradientColors,
+            description: trimmedPrompt,
+            styleKey: "",
+            sampleImages: imagePaths,
+            customPrompt: trimmedPrompt
+        )
+    }
+
     var themeMode: ThemeMode = ThemeMode(rawValue: UserDefaults.standard.string(forKey: "hairlens_theme") ?? "system") ?? .system {
         didSet { UserDefaults.standard.set(themeMode.rawValue, forKey: "hairlens_theme") }
     }
