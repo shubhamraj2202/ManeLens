@@ -29,7 +29,7 @@ You are building **Hair Lens - AI** — a native iOS app that previews hairstyle
 | Bundle ID | `com.aurax.ai.shubh.mane` |
 | Min iOS | 18.0 |
 | Marketing Version | 1.0 |
-| Build Number | 1 |
+| Build Number | 3 (Xcode Cloud manages the real build number automatically) |
 | Dev Team | 48BYR3J82W |
 | Devices | iPhone + iPad |
 | Worker Repo | `aurax-api` (sibling repo) |
@@ -185,6 +185,7 @@ The output must look like a real unedited photograph of this exact person with t
 18. **Style catalog is bundled JSON, not server-fetched** — V1 ships frozen. Updates ship via App Store.
 19. **The prompt template is the moat** — `buildHairPrompt()` cannot change without re-running Session 0 regression on the canonical 10-selfie set.
 20. **Compress before upload** — 1024px JPEG q=0.8. Never send raw camera output (saves bandwidth + latency + cost).
+21. **Do not manually increment build numbers.** Xcode Cloud manages build numbers dynamically during archiving. Your local codebase will purposefully remain at a static, low number (e.g., 3) while TestFlight shows the true incremented number (e.g., 33). This is Apple's recommended best practice to keep your Git history clean of "bump build" commits.
 
 ---
 
@@ -246,7 +247,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-20
-**Current State:** SESSION 12 COMPLETE — Bug #16 (StyleDetailView hero face cut off) and Bug #17 (StyleCardView badge alignment) fixed. Dark/Light/System theme toggle added. Build succeeds cleanly.
+**Current State:** SESSION 13 COMPLETE — UI polish, iCloud KV backup, Edit custom styles, crash fix, logo update. Build succeeds cleanly.
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
@@ -343,14 +344,30 @@ VStack(spacing: 0) {
 | 16 | StyleDetailView | Hero face cut off by nav bar | FIXED ✅ |
 | 17 | StyleCardView | Badge alignment (category top-left, NEW top-right) | FIXED ✅ |
 
-**PENDING BEFORE SUBMISSION — Session 13:**
+**Session 13 additions (all committed, all building):**
+- Hero image + photo box unified to 240pt height — visually consistent
+- StyleDetailView nav: ellipsis removed for custom styles; all styles show plain heart
+- Home grid long-press context menu: Favorite (all), Edit + Delete (custom only)
+- Card height 165 → 190pt so style name always visible
+- Edit custom style: CustomPromptView editingStyle param, AppState.updateCustomStyle, Screen.editCustomStyle — long-press Edit pre-fills name/prompt/images
+- Onboarding Continue button fix: .white variant used Color.hairText (white in dark mode) → hardcoded dark purple
+- Removed "Continue without account" from onboarding slide 3
+- iCloud KV: ManeLens.entitlements + CODE_SIGN_ENTITLEMENTS wired in pbxproj
+- iCloud KV credit persistence: survives reinstall (NSUbiquitousKeyValueStore + UserDefaults belt-and-suspenders)
+- iCloud KV for favorites, custom styles metadata, history metadata — all sync to iCloud
+- Crash fix: index out of range in sample image remove (stale ForEach offset guard)
+- Logo: replaced 💇 emoji with wand.and.stars SF Symbol (white + glow on gradient)
+
+**iCloud KV note:** Entitlements file created + pbxproj wired. User must also check "Key-value storage" under iCloud in Xcode → Signing & Capabilities to activate provisioning profile sync.
+
+**PENDING BEFORE SUBMISSION — Session 14:**
 1. Add remaining 23 sample PNGs (female styles) to Assets.xcassets + populate sampleImages in HairStyle.swift
 2. Create `hairLens-privacy.html` + `hairLens-terms.html` on shubhamraj2202.github.io
 3. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
 4. App Store screenshots — 1320×2868 (6.9") and 1179×2556 (6.3")
 5. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
 
-**Next Step:** Session 13 — add female sample images when Gemini delivers them, then TestFlight.
+**Next Step:** Session 14 — female sample images, then TestFlight.
 
 
 ---
