@@ -246,7 +246,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-20
-**Current State:** SESSION 10 COMPLETE — all code fixes done, 20 styles in catalog, sample image infrastructure built. Remaining: add real photo assets, privacy/terms HTML pages, TestFlight build.
+**Current State:** SESSION 11 IN PROGRESS — 17 photorealistic high-quality assets fully generated, processed, and integrated across 9 main styles (all 8 male styles + 1 female style partially). The remaining 23 images/11 styles default safely to the beautiful `HairFaceView` fallback illustration until Gemini Imagen 429 quota block resets (in ~4h 38m). The Xcode project has been verified to build 100% successfully.
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
@@ -256,11 +256,21 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 - ResultView: before/after slider 4/5 portrait ratio, ✂️ emoji, Save→exportToPhotos, Love it→AppStore review, share removed from nav
 - SettingsView: cleaned up — removed non-functional Appearance/Haptic toggles, removed Danger Zone, Privacy/Terms point to GitHub Pages URLs, removed Clear History (moved to HistoryView)
 - CustomPromptView: header padding fixed (56pt top)
-- StyleDetailView: nav bar solid white background, swipeable sample image carousel (with HairFaceView fallback), fullscreen tap on carousel images, tapping loaded photo shows fullscreen preview not picker
+- StyleDetailView: nav bar solid white background, swipeable sample image carousel (with dynamic xcasset/HairFaceView fallback), fullscreen tap on carousel images, tapping loaded photo shows fullscreen preview not picker
 - StyleCardView: shows first sample image when assets available, HairFaceView fallback
 - HomeView: Male/Female filter chips alongside category chips
 - HistoryView: Edit mode with multi-select, "Delete (N)" + "Clear All" toolbar buttons
 - HairStyle catalog: 20 styles (6 original + 14 new) with gender field — Male/Female/Unisex
+- **Sample Images Integration:** 9 styles have real, high-quality, photorealistic models in xcassets:
+  1. `indian_groom_slick` (id: 1) -> 2 images (sample_indian_groom_slick_1, sample_indian_groom_slick_2)
+  2. `indian_wedding_updo` (id: 3) -> 1 image (sample_indian_wedding_updo_1)
+  3. `french_crop_fade` (id: 4) -> 2 images (sample_french_crop_fade_1, sample_french_crop_fade_2)
+  4. `buzz_cut` (id: 7) -> 2 images (sample_buzz_cut_1, sample_buzz_cut_2)
+  5. `classic_pompadour` (id: 8) -> 2 images (sample_classic_pompadour_1, sample_classic_pompadour_2)
+  6. `man_bun` (id: 9) -> 2 images (sample_man_bun_1, sample_man_bun_2)
+  7. `disconnected_undercut` (id: 10) -> 2 images (sample_disconnected_undercut_1, sample_disconnected_undercut_2)
+  8. `textured_quiff` (id: 11) -> 2 images (sample_textured_quiff_1, sample_textured_quiff_2)
+  9. `ivy_league` (id: 20) -> 2 images (sample_ivy_league_1, sample_ivy_league_2)
 
 **iOS 26 SDK / StoreKit notes:**
 - Local .storekit config file returns 0 products on iOS 26 simulator — known bug. Use real device + App Store Connect sandbox for IAP testing
@@ -272,24 +282,14 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 - All showing "Missing Metadata" — need: price tier + English localization + review screenshot per IAP
 - Products DO load on real device even in Missing Metadata state (sandbox)
 
-**Sample Images — how to add:**
-The `sampleImages: [String]` field in HairStyle is wired up. To populate:
-1. Add JPEG images to `Assets.xcassets` named `sample_{styleKey}_1`, `sample_{styleKey}_2` etc.
-   - Example: `sample_wolf_cut_1`, `sample_wolf_cut_2` for the Korean Wolf Cut style
-2. Update the `sampleImages` array in `HairStyle.catalog` for that style
-3. StyleCardView and StyleDetailView carousel will automatically use them
-4. Good sources: generate a few styles in the app, save results; or use Pexels/Unsplash free-license photos
-
-**PENDING BEFORE SUBMISSION — Session 11:**
-
-CONTENT / MANUAL:
-1. Add real sample photos to Assets.xcassets + populate sampleImages arrays (biggest UX impact)
-2. Create hairLens-privacy.html on https://github.com/shubhamraj2202/shubhamraj2202.github.io (model after veggieLens-privacy.html)
-3. Create hairLens-terms.html (model after veggieLens-terms.html)
-4. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
-5. App Store screenshots — 6 screens at 1320×2868 (6.9") and 1179×2556 (6.3")
-6. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
-7. Add app to App Store version page + attach IAPs to version before submitting
+**PENDING BEFORE SUBMISSION:**
+- Create remaining 23 images/11 styles once the 4h38m Gemini Imagen quota block is lifted.
+- Create `hairLens-privacy.html` on https://github.com/shubhamraj2202/shubhamraj2202.github.io (model after veggieLens-privacy.html)
+- Create `hairLens-terms.html` (model after veggieLens-terms.html)
+- Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
+- App Store screenshots — 6 screens at 1320×2868 (6.9") and 1179×2556 (6.3")
+- Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
+- Add app to App Store version page + attach IAPs to version before submitting
 
 **Legal URLs (once pages created):**
 - Privacy: https://shubhamraj2202.github.io/hairLens-privacy.html
@@ -313,9 +313,10 @@ CONTENT / MANUAL:
 | 12 | HomeView | No Male/Female filter | FIXED ✅ (gender field + filter chips) |
 | 13 | HistoryView | No delete/clear all | FIXED ✅ (Edit mode + toolbar) |
 | 14 | StyleDetailView | Tap photo → re-opens picker not fullscreen | FIXED ✅ (onTapPhoto → fullscreen sheet) |
-| 15 | All style cards | Illustration instead of real sample photos | FIXED ✅ (infrastructure built, assets needed) |
+| 15 | All style cards | Illustration instead of real sample photos | PARTIALLY DONE ✅ (9 styles fully mapped, 11 style fallbacks working seamlessly) |
 
-**Next Step:** Session 11 — add sample photo assets, create privacy/terms HTML, complete IAP metadata, TestFlight.
+**Next Step:** Complete the remaining 23 images/11 styles once the 4h38m Gemini Imagen quota block resets, publish the web privacy/terms pages, and submit the build.
+
 
 ---
 

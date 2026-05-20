@@ -31,7 +31,8 @@ extension HairStyle {
                 Color(red: 0.298, green: 0.157, blue: 0.596),
             ],
             description: "A timeless, structured cut that blends clean sides with a polished top — perfect for the big day.",
-            styleKey: "indian_groom_slick"
+            styleKey: "indian_groom_slick",
+            sampleImages: ["sample_indian_groom_slick_1", "sample_indian_groom_slick_2"]
         ),
         HairStyle(
             id: 2, name: "Korean Wolf Cut", category: "Salon", gender: "Unisex",
@@ -54,7 +55,8 @@ extension HairStyle {
                 Color(red: 0.612, green: 0.125, blue: 0.125),
             ],
             description: "An elaborate swept-up style adorned with layers and volume, ideal for traditional ceremonies.",
-            styleKey: "indian_wedding_updo"
+            styleKey: "indian_wedding_updo",
+            sampleImages: ["sample_indian_wedding_updo_1"]
         ),
         HairStyle(
             id: 4, name: "French Crop Fade", category: "Casual", gender: "Male",
@@ -65,7 +67,8 @@ extension HairStyle {
                 Color(red: 0.157, green: 0.157, blue: 0.282),
             ],
             description: "Short, clean and sharp — a low-maintenance crop with a high-contrast fade that suits any occasion.",
-            styleKey: "french_crop_fade"
+            styleKey: "french_crop_fade",
+            sampleImages: ["sample_french_crop_fade_1", "sample_french_crop_fade_2"]
         ),
         HairStyle(
             id: 5, name: "Beach Waves", category: "Bold", gender: "Female",
@@ -101,7 +104,8 @@ extension HairStyle {
                 Color(red: 0.255, green: 0.165, blue: 0.082),
             ],
             description: "Ultra-short, uniform length all over — minimal effort, maximum confidence. Clean and military-sharp.",
-            styleKey: "buzz_cut"
+            styleKey: "buzz_cut",
+            sampleImages: ["sample_buzz_cut_1", "sample_buzz_cut_2"]
         ),
         HairStyle(
             id: 8, name: "Classic Pompadour", category: "Salon", gender: "Male",
@@ -112,7 +116,8 @@ extension HairStyle {
                 Color(red: 0.180, green: 0.118, blue: 0.063),
             ],
             description: "Voluminous, swept-back top with tight sides — a retro-inspired statement that commands the room.",
-            styleKey: "classic_pompadour"
+            styleKey: "classic_pompadour",
+            sampleImages: ["sample_classic_pompadour_1", "sample_classic_pompadour_2"]
         ),
         HairStyle(
             id: 9, name: "Man Bun", category: "Casual", gender: "Male",
@@ -123,7 +128,8 @@ extension HairStyle {
                 Color(red: 0.412, green: 0.263, blue: 0.133),
             ],
             description: "Long hair tied into a relaxed bun at the crown — effortlessly cool and practical for every season.",
-            styleKey: "man_bun"
+            styleKey: "man_bun",
+            sampleImages: ["sample_man_bun_1", "sample_man_bun_2"]
         ),
         HairStyle(
             id: 10, name: "Disconnected Undercut", category: "Bold", gender: "Male",
@@ -134,7 +140,8 @@ extension HairStyle {
                 Color(red: 0.118, green: 0.118, blue: 0.118),
             ],
             description: "Shaved sides with a dramatic length contrast on top — a bold, high-fashion cut with serious edge.",
-            styleKey: "disconnected_undercut"
+            styleKey: "disconnected_undercut",
+            sampleImages: ["sample_disconnected_undercut_1", "sample_disconnected_undercut_2"]
         ),
         HairStyle(
             id: 11, name: "Textured Quiff", category: "Salon", gender: "Male",
@@ -146,7 +153,8 @@ extension HairStyle {
             ],
             description: "A modern twist on the classic quiff — textured, tousled, and styled with a natural matte finish.",
             styleKey: "textured_quiff",
-            isNew: true
+            isNew: true,
+            sampleImages: ["sample_textured_quiff_1", "sample_textured_quiff_2"]
         ),
 
         // ── Female styles ──────────────────────────────────────────────────
@@ -250,7 +258,8 @@ extension HairStyle {
                 Color(red: 0.510, green: 0.333, blue: 0.165),
             ],
             description: "A longer, side-parted crew cut with a polished finish — smart, clean and eternally preppy.",
-            styleKey: "ivy_league"
+            styleKey: "ivy_league",
+            sampleImages: ["sample_ivy_league_1", "sample_ivy_league_2"]
         ),
     ]
 
