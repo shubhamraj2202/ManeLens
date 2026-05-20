@@ -13,8 +13,10 @@ struct StyleDetailView: View {
     @State private var showSampleFullscreen = false
     @State private var showPhotoPreview = false
 
+    @State private var showDeleteConfirm = false
+
     private var sampleUIImages: [UIImage] {
-        style.sampleImages.compactMap { UIImage(named: $0) }
+        style.sampleImages.compactMap { StyleImageLoader.load($0) }
     }
 
     var body: some View {
@@ -27,15 +29,9 @@ struct StyleDetailView: View {
                         // Hero area — carousel when images available, illustration otherwise
                         heroArea
                             .frame(maxWidth: .infinity)
-                            .clipShape(
-                                UnevenRoundedRectangle(
-                                    topLeadingRadius: 0,
-                                    bottomLeadingRadius: 20,
-                                    bottomTrailingRadius: 20,
-                                    topTrailingRadius: 0,
-                                    style: .continuous
-                                )
-                            )
+                            .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
+                            .padding(.horizontal, DS.paddingPage)
+                            .padding(.top, 8)
 
                         VStack(alignment: .leading, spacing: 16) {
                             Text(style.description)
@@ -87,6 +83,15 @@ struct StyleDetailView: View {
                 FullscreenCarouselSheet(images: sampleUIImages, startIndex: carouselPage)
             }
         }
+        .alert("Delete this style?", isPresented: $showDeleteConfirm) {
+            Button("Delete", role: .destructive) {
+                appState.deleteCustomStyle(id: style.id)
+                onBack()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("'\(style.name)' will be removed from My Styles. This cannot be undone.")
+        }
     }
 
     // MARK: - Hero
@@ -132,15 +137,36 @@ struct StyleDetailView: View {
         ScreenNav(
             title: style.name,
             onBack: onBack,
-            trailing: AnyView(
-                Button(action: { appState.toggleFavorite(style.id) }) {
-                    Image(systemName: appState.isFavorite(style.id) ? "heart.fill" : "heart")
-                        .font(.system(size: 20))
-                        .foregroundStyle(appState.isFavorite(style.id) ? Color.hairPink : Color.hairText)
-                }
-            )
+            trailing: AnyView(navTrailing)
         )
         .background(Color.hairBg)
+    }
+
+    @ViewBuilder
+    private var navTrailing: some View {
+        if style.isCustom {
+            Menu {
+                Button { appState.toggleFavorite(style.id) } label: {
+                    Label(
+                        appState.isFavorite(style.id) ? "Unfavorite" : "Favorite",
+                        systemImage: appState.isFavorite(style.id) ? "heart.slash" : "heart"
+                    )
+                }
+                Button(role: .destructive) { showDeleteConfirm = true } label: {
+                    Label("Delete Style", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Color.hairText)
+            }
+        } else {
+            Button(action: { appState.toggleFavorite(style.id) }) {
+                Image(systemName: appState.isFavorite(style.id) ? "heart.fill" : "heart")
+                    .font(.system(size: 20))
+                    .foregroundStyle(appState.isFavorite(style.id) ? Color.hairPink : Color.hairText)
+            }
+        }
     }
 
     // MARK: - Tips

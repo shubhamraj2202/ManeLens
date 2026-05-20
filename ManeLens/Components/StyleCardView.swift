@@ -65,7 +65,7 @@ struct StyleCardView: View {
 
     @ViewBuilder
     private var cardImage: some View {
-        if let first = style.sampleImages.first, let uiImage = UIImage(named: first) {
+        if let first = style.sampleImages.first, let uiImage = StyleImageLoader.load(first) {
             Image(uiImage: uiImage)
                 .resizable()
                 .scaledToFill()

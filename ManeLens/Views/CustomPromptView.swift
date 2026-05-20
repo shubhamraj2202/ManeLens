@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct CustomPromptView: View {
     @Bindable var appState: AppState
@@ -8,6 +9,8 @@ struct CustomPromptView: View {
     @State private var showPicker = false
     @State private var styleName: String = ""
     @State private var savedToast: String? = nil
+    @State private var sampleImagePickerItems: [PhotosPickerItem] = []
+    @State private var sampleImages: [UIImage] = []
 
     private let chips = ["Long & wavy", "Short & textured", "Bold color", "Vintage", "Editorial", "Curly"]
     private let maxLength = 200
@@ -89,6 +92,62 @@ struct CustomPromptView: View {
                         RoundedRectangle(cornerRadius: DS.radiusInput)
                             .stroke(Color.hairPurple.opacity(0.2), lineWidth: 1.5)
                     )
+
+                    // Optional: sample images for the saved style's card
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Sample Images")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(Color.hairText)
+                            Text("(optional)")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.hairTextSec)
+                            Spacer()
+                            PhotosPicker(selection: $sampleImagePickerItems, maxSelectionCount: 5, matching: .images) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 11, weight: .bold))
+                                    Text(sampleImages.isEmpty ? "Add" : "Edit")
+                                        .font(.system(size: 12, weight: .semibold))
+                                }
+                                .foregroundStyle(Color.hairPurple)
+                            }
+                        }
+
+                        if sampleImages.isEmpty {
+                            Text("Add up to 5 reference photos to show on this style's card.")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.hairTextSec)
+                        } else {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(Array(sampleImages.enumerated()), id: \.offset) { idx, img in
+                                        ZStack(alignment: .topTrailing) {
+                                            Image(uiImage: img)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 72, height: 72)
+                                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                            Button {
+                                                sampleImages.remove(at: idx)
+                                                if idx < sampleImagePickerItems.count {
+                                                    sampleImagePickerItems.remove(at: idx)
+                                                }
+                                            } label: {
+                                                Image(systemName: "xmark")
+                                                    .font(.system(size: 9, weight: .bold))
+                                                    .foregroundStyle(.white)
+                                                    .frame(width: 18, height: 18)
+                                                    .background(.black.opacity(0.65))
+                                                    .clipShape(Circle())
+                                            }
+                                            .padding(4)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     // Save Style — saves the template (without generating)
                     Button(action: saveCustomStyle) {
@@ -174,6 +233,18 @@ struct CustomPromptView: View {
                 appState.selectedPhoto = image
             }
         }
+        .onChange(of: sampleImagePickerItems) { _, items in
+            Task {
+                var images: [UIImage] = []
+                for item in items {
+                    if let data = try? await item.loadTransferable(type: Data.self),
+                       let img = UIImage(data: data) {
+                        images.append(img)
+                    }
+                }
+                await MainActor.run { sampleImages = images }
+            }
+        }
         .overlay(alignment: .bottom) {
             if let msg = savedToast {
                 Text(msg)
@@ -197,10 +268,12 @@ struct CustomPromptView: View {
 
     private func saveCustomStyle() {
         guard canSave else { return }
-        appState.saveCustomStyle(name: styleName, prompt: appState.customPromptText)
+        appState.saveCustomStyle(name: styleName, prompt: appState.customPromptText, sampleImages: sampleImages)
         savedToast = "Saved to My Styles"
         styleName = ""
         appState.customPromptText = ""
+        sampleImages = []
+        sampleImagePickerItems = []
     }
 
     private var bottomCTA: some View {

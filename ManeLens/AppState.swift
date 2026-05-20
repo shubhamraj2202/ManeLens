@@ -51,12 +51,16 @@ class AppState {
         self.customStyles = CustomStylesStore.shared.load()
     }
 
-    func saveCustomStyle(name: String, prompt: String) {
+    func saveCustomStyle(name: String, prompt: String, sampleImages: [UIImage] = []) {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedPrompt = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty, !trimmedPrompt.isEmpty else { return }
+        let newID = CustomStylesStore.shared.nextID()
+        let imagePaths = sampleImages.isEmpty
+            ? []
+            : CustomStylesStore.shared.saveSampleImages(sampleImages, for: newID)
         let style = HairStyle(
-            id: CustomStylesStore.shared.nextID(),
+            id: newID,
             name: trimmedName,
             category: "Custom",
             gender: "Unisex",
@@ -68,6 +72,7 @@ class AppState {
             ],
             description: trimmedPrompt,
             styleKey: "",
+            sampleImages: imagePaths,
             customPrompt: trimmedPrompt
         )
         customStyles.append(style)
@@ -75,6 +80,8 @@ class AppState {
 
     func deleteCustomStyle(id: Int) {
         customStyles.removeAll { $0.id == id }
+        CustomStylesStore.shared.deleteSampleImages(for: id)
+        favorites.remove(id)
     }
 
     var themeMode: ThemeMode = ThemeMode(rawValue: UserDefaults.standard.string(forKey: "hairlens_theme") ?? "system") ?? .system {
