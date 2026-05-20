@@ -57,9 +57,11 @@ struct HomeView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(LinearGradient.hairBrand)
-                        .frame(width: 34, height: 34)
-                    Text("💇")
-                        .font(.system(size: 18))
+                        .frame(width: 36, height: 36)
+                    Image(systemName: "wand.and.stars")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .shadow(color: .white.opacity(0.4), radius: 4, x: 0, y: 0)
                 }
                 Text("Hair Lens")
                     .font(.system(size: 18, weight: .bold))
