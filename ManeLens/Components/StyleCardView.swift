@@ -8,31 +8,19 @@ struct StyleCardView: View {
 
     var body: some View {
         Button(action: action) {
-            ZStack(alignment: .bottom) {
-                // Card image — real sample photo if available, else illustration
+            ZStack {
                 cardImage
-                    .aspectRatio(5/6, contentMode: .fill)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .clipped()
 
-                // Bottom gradient overlay
+                // Bottom gradient
                 LinearGradient(
                     colors: [.clear, .black.opacity(0.85)],
                     startPoint: .center,
                     endPoint: .bottom
                 )
 
-                // Style name
-                HStack {
-                    Text(style.name)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                    Spacer()
-                }
-                .padding(.horizontal, 10)
-                .padding(.bottom, 10)
-
-                // Category + NEW badge (top row)
+                // Top badges — category top-left, NEW top-right
                 VStack {
                     HStack(alignment: .top) {
                         Text(style.category)
@@ -54,13 +42,26 @@ struct StyleCardView: View {
                                 .clipShape(Capsule())
                         }
                     }
+                    .padding(8)
                     Spacer()
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .padding(8)
+
+                // Style name at bottom
+                VStack {
+                    Spacer()
+                    HStack {
+                        Text(style.name)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 10)
+                }
             }
         }
-        .aspectRatio(5/6, contentMode: .fit)
+        .frame(height: 165)
         .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
         .shadow(color: .black.opacity(0.14), radius: 7, x: 0, y: 2)
         .scaleEffect(pressed ? 0.96 : 1.0)
