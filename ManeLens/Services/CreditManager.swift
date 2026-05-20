@@ -14,18 +14,26 @@ final class CreditManager {
     private static let firstRunKey  = "hairlens_first_run_v1"
     private static let workerBase   = "https://aurax-api.auraxai.workers.dev"
 
+    private static var iCloudStore: NSUbiquitousKeyValueStore { .default }
+
     // nonisolated(unsafe) so deinit (which is nonisolated) can cancel it
     nonisolated(unsafe) private var updates: Task<Void, Never>?
 
     init() {
-        let stored = UserDefaults.standard.integer(forKey: Self.creditsKey)
-        if !UserDefaults.standard.bool(forKey: Self.firstRunKey) {
+        // Prefer iCloud KV (survives reinstall); fall back to UserDefaults
+        let iCloudFirst = !UserDefaults.standard.bool(forKey: Self.firstRunKey)
+        let iCloudValue = Int(Self.iCloudStore.longLong(forKey: Self.creditsKey))
+        let localValue  = UserDefaults.standard.integer(forKey: Self.creditsKey)
+
+        if iCloudFirst && iCloudValue == 0 && localValue == 0 {
+            // True first install — grant 3 free credits
             credits = 3
-            UserDefaults.standard.set(3, forKey: Self.creditsKey)
-            UserDefaults.standard.set(true, forKey: Self.firstRunKey)
         } else {
-            credits = stored
+            // Reinstall or existing user — iCloud wins if non-zero, else local
+            credits = iCloudValue > 0 ? iCloudValue : localValue
         }
+        UserDefaults.standard.set(true, forKey: Self.firstRunKey)
+        persist()
         updates = Task { @MainActor in await self.observeTransactionUpdates() }
     }
 
@@ -112,6 +120,8 @@ final class CreditManager {
 
     private func persist() {
         UserDefaults.standard.set(credits, forKey: Self.creditsKey)
+        Self.iCloudStore.set(Int64(credits), forKey: Self.creditsKey)
+        Self.iCloudStore.synchronize()
     }
 
     private func creditsFor(productID: String) -> Int {
