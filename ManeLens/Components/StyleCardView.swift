@@ -4,8 +4,6 @@ struct StyleCardView: View {
     let style: HairStyle
     let action: () -> Void
 
-    @State private var pressed = false
-
     var body: some View {
         Button(action: action) {
             ZStack {
@@ -64,13 +62,7 @@ struct StyleCardView: View {
         .frame(height: 165)
         .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
         .shadow(color: .black.opacity(0.14), radius: 7, x: 0, y: 2)
-        .scaleEffect(pressed ? 0.96 : 1.0)
-        .animation(.spring(response: 0.2, dampingFraction: 0.7), value: pressed)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in pressed = true }
-                .onEnded { _ in pressed = false }
-        )
+        .buttonStyle(StyleCardButtonStyle())
     }
 
     @ViewBuilder
@@ -82,5 +74,15 @@ struct StyleCardView: View {
         } else {
             StyleHeroView(style: style)
         }
+    }
+}
+
+// ButtonStyle so the system arbitrates tap vs ScrollView pan correctly —
+// prior simultaneousGesture(DragGesture(minimumDistance:0)) blocked scroll.
+private struct StyleCardButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
