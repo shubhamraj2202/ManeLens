@@ -34,7 +34,7 @@ struct StyleCardView: View {
 
                 // Category + NEW badge (top row)
                 VStack {
-                    HStack {
+                    HStack(alignment: .top) {
                         Text(style.category)
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(.white)
@@ -56,6 +56,7 @@ struct StyleCardView: View {
                     }
                     Spacer()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .padding(8)
             }
         }

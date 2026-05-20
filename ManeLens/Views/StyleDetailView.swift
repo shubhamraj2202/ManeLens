@@ -20,57 +20,59 @@ struct StyleDetailView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    // Hero area — carousel when images available, illustration otherwise
-                    heroArea
-                        .frame(maxWidth: .infinity)
-                        .clipShape(
-                            UnevenRoundedRectangle(
-                                topLeadingRadius: 0,
-                                bottomLeadingRadius: 20,
-                                bottomTrailingRadius: 20,
-                                topTrailingRadius: 0,
-                                style: .continuous
+            VStack(spacing: 0) {
+                navBar
+
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        // Hero area — carousel when images available, illustration otherwise
+                        heroArea
+                            .frame(maxWidth: .infinity)
+                            .clipShape(
+                                UnevenRoundedRectangle(
+                                    topLeadingRadius: 0,
+                                    bottomLeadingRadius: 20,
+                                    bottomTrailingRadius: 20,
+                                    topTrailingRadius: 0,
+                                    style: .continuous
+                                )
                             )
-                        )
 
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text(style.description)
-                            .font(.system(size: 15))
-                            .foregroundStyle(Color.hairTextSec)
-                            .lineSpacing(4)
-                            .lineLimit(3)
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text(style.description)
+                                .font(.system(size: 15))
+                                .foregroundStyle(Color.hairTextSec)
+                                .lineSpacing(4)
+                                .lineLimit(3)
 
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Your Photo")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(Color.hairText)
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Your Photo")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(Color.hairText)
 
-                            PhotoUploadZone(
-                                photo: appState.selectedPhoto,
-                                hairColor: style.hairColor,
-                                onTap: { showPicker = true },
-                                onTapPhoto: { showPhotoPreview = true },
-                                onRemove: { appState.selectedPhoto = nil }
-                            )
+                                PhotoUploadZone(
+                                    photo: appState.selectedPhoto,
+                                    hairColor: style.hairColor,
+                                    onTap: { showPicker = true },
+                                    onTapPhoto: { showPhotoPreview = true },
+                                    onRemove: { appState.selectedPhoto = nil }
+                                )
+                            }
+
+                            tipsSection
+
+                            Spacer(minLength: 120)
                         }
-
-                        tipsSection
-
-                        Spacer(minLength: 120)
+                        .padding(.horizontal, DS.paddingPage)
+                        .padding(.top, 16)
                     }
-                    .padding(.horizontal, DS.paddingPage)
-                    .padding(.top, 16)
                 }
             }
-            .ignoresSafeArea(edges: .top)
 
             bottomCTA
         }
         .background(Color.hairBg)
         .navigationBarHidden(true)
-        .overlay(alignment: .top) { navBar }
         .sheet(isPresented: $showPicker) {
             PhotoPickerSheet(isPresented: $showPicker) { image in
                 appState.selectedPhoto = image
@@ -94,7 +96,7 @@ struct StyleDetailView: View {
     private var heroArea: some View {
         if sampleUIImages.isEmpty {
             StyleHeroView(style: style)
-                .aspectRatio(16/9, contentMode: .fit)
+                .aspectRatio(4/3, contentMode: .fit)
         } else {
             ZStack(alignment: .bottom) {
                 TabView(selection: $carouselPage) {
@@ -107,7 +109,7 @@ struct StyleDetailView: View {
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .aspectRatio(16/9, contentMode: .fit)
+                .aspectRatio(4/3, contentMode: .fit)
 
                 // Page dots
                 if sampleUIImages.count > 1 {
@@ -213,7 +215,7 @@ struct StyleDetailView: View {
         .padding(.bottom, 44)
         .background(
             LinearGradient(
-                colors: [.white.opacity(0), .white],
+                colors: [Color.hairBg.opacity(0), Color.hairBg],
                 startPoint: .top,
                 endPoint: UnitPoint(x: 0.5, y: 0.2)
             )

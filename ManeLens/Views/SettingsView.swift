@@ -12,6 +12,23 @@ struct SettingsView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
+                    // Appearance
+                    SettingsSection(title: "Appearance") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Theme")
+                                .font(.system(size: 16))
+                                .foregroundStyle(Color.hairText)
+                            Picker("Theme", selection: $appState.themeMode) {
+                                ForEach(ThemeMode.allCases, id: \.self) { mode in
+                                    Text(mode.label).tag(mode)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                    }
+
                     // Account
                     SettingsSection(title: "Account") {
                         SettingsRow(label: "Credits Remaining", trailing: AnyView(
@@ -150,7 +167,7 @@ private struct SettingsSection<Content: View>: View {
             VStack(spacing: 0) {
                 content()
             }
-            .background(Color.white)
+            .background(Color.hairBg)
             .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
             .overlay(
                 RoundedRectangle(cornerRadius: DS.radiusCard)

@@ -2,15 +2,15 @@ import SwiftUI
 
 // MARK: - Brand Colors
 extension Color {
-    static let hairPurple      = Color(red: 0.486, green: 0.227, blue: 0.929)   // #7C3AED
-    static let hairPink        = Color(red: 0.925, green: 0.286, blue: 0.600)   // #EC4899
-    static let hairText        = Color(red: 0.094, green: 0.094, blue: 0.106)   // #18181B
-    static let hairTextSec     = Color(red: 0.443, green: 0.443, blue: 0.478)   // #71717A
-    static let hairBg          = Color.white
-    static let hairBgOff       = Color(red: 0.980, green: 0.980, blue: 0.980)   // #FAFAFA
-    static let hairPurpleLight = Color(red: 0.961, green: 0.953, blue: 1.000)   // #F5F3FF
+    static let hairPurple      = Color(red: 0.486, green: 0.227, blue: 0.929)   // #7C3AED — fixed brand
+    static let hairPink        = Color(red: 0.925, green: 0.286, blue: 0.600)   // #EC4899 — fixed brand
+    static let hairText        = Color(UIColor.label)                            // adaptive
+    static let hairTextSec     = Color(UIColor.secondaryLabel)                   // adaptive
+    static let hairBg          = Color(UIColor.systemBackground)                 // adaptive
+    static let hairBgOff       = Color(UIColor.secondarySystemBackground)        // adaptive
+    static let hairPurpleLight = Color(red: 0.961, green: 0.953, blue: 1.000)   // #F5F3FF — brand tint
     static let hairPurpleAlpha = Color(red: 0.486, green: 0.227, blue: 0.929).opacity(0.10)
-    static let hairBorder      = Color.black.opacity(0.06)
+    static let hairBorder      = Color(UIColor.separator)                        // adaptive
 }
 
 // MARK: - Gradient
@@ -180,7 +180,7 @@ struct ScreenNav: View {
 struct CardShadow: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(Color.white)
+            .background(Color.hairBg)
             .cornerRadius(DS.radiusCard)
             .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 2)
     }

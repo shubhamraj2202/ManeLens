@@ -1,6 +1,26 @@
 import SwiftUI
 import UIKit
 
+enum ThemeMode: String, CaseIterable {
+    case system, light, dark
+
+    var label: String {
+        switch self {
+        case .system: return "System"
+        case .light:  return "Light"
+        case .dark:   return "Dark"
+        }
+    }
+
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light:  return .light
+        case .dark:   return .dark
+        }
+    }
+}
+
 struct GenerationRecord: Identifiable {
     let id = UUID()
     let style: HairStyle
@@ -19,6 +39,10 @@ class AppState {
     var customPromptText: String = ""
     var generationError: String? = nil
     var history: [GenerationRecord] = []
+
+    var themeMode: ThemeMode = ThemeMode(rawValue: UserDefaults.standard.string(forKey: "hairlens_theme") ?? "system") ?? .system {
+        didSet { UserDefaults.standard.set(themeMode.rawValue, forKey: "hairlens_theme") }
+    }
 
     var credits: Int { creditManager.credits }
     var hasPhoto: Bool { selectedPhoto != nil }

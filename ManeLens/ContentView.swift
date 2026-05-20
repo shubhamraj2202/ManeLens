@@ -129,6 +129,7 @@ struct ContentView: View {
                 .transition(.move(edge: .trailing))
             }
         }
+        .preferredColorScheme(appState.themeMode.colorScheme)
         .animation(.easeInOut(duration: 0.3), value: screenDescription)
         .alert("Generation Failed", isPresented: Binding(
             get: { appState.generationError != nil },
