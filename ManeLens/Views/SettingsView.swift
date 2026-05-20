@@ -6,8 +6,6 @@ struct SettingsView: View {
     var onBack: () -> Void
     var onGetMore: () -> Void
 
-    @State private var showClearHistoryAlert = false
-
     var body: some View {
         VStack(spacing: 0) {
             ScreenNav(title: "Settings", onBack: onBack)
@@ -91,25 +89,6 @@ struct SettingsView: View {
                         Divider().padding(.leading, 16)
 
                         SettingsRow(label: "Acknowledgments", trailing: AnyView(chevron))
-                    }
-
-                    // Clear History
-                    Button { showClearHistoryAlert = true } label: {
-                        Text("Clear History")
-                            .font(.system(size: 15))
-                            .foregroundStyle(Color(red: 0.937, green: 0.267, blue: 0.267))
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 50)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
-                            .overlay(RoundedRectangle(cornerRadius: DS.radiusCard).stroke(Color.hairBorder, lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-                    .alert("Clear History?", isPresented: $showClearHistoryAlert) {
-                        Button("Clear", role: .destructive) { appState.history.removeAll() }
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("All past generations will be removed. This cannot be undone.")
                     }
 
                     // Footer

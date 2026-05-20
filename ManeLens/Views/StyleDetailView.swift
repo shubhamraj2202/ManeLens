@@ -10,15 +10,21 @@ struct StyleDetailView: View {
     @State private var isFavorited = false
     @State private var tipsExpanded = false
     @State private var showPicker = false
+    @State private var carouselPage = 0
+    @State private var showSampleFullscreen = false
+    @State private var showPhotoPreview = false
+
+    private var sampleUIImages: [UIImage] {
+        style.sampleImages.compactMap { UIImage(named: $0) }
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
-                    // Hero image — sharp top, rounded bottom corners
-                    StyleHeroView(style: style)
+                    // Hero area — carousel when images available, illustration otherwise
+                    heroArea
                         .frame(maxWidth: .infinity)
-                        .aspectRatio(16/9, contentMode: .fit)
                         .clipShape(
                             UnevenRoundedRectangle(
                                 topLeadingRadius: 0,
@@ -30,14 +36,12 @@ struct StyleDetailView: View {
                         )
 
                     VStack(alignment: .leading, spacing: 16) {
-                        // Description
                         Text(style.description)
                             .font(.system(size: 15))
                             .foregroundStyle(Color.hairTextSec)
                             .lineSpacing(4)
                             .lineLimit(3)
 
-                        // Photo upload
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Your Photo")
                                 .font(.system(size: 15, weight: .semibold))
@@ -47,14 +51,13 @@ struct StyleDetailView: View {
                                 photo: appState.selectedPhoto,
                                 hairColor: style.hairColor,
                                 onTap: { showPicker = true },
+                                onTapPhoto: { showPhotoPreview = true },
                                 onRemove: { appState.selectedPhoto = nil }
                             )
                         }
 
-                        // Tips
                         tipsSection
 
-                        // Spacer for bottom gradient
                         Spacer(minLength: 120)
                     }
                     .padding(.horizontal, DS.paddingPage)
@@ -63,20 +66,66 @@ struct StyleDetailView: View {
             }
             .ignoresSafeArea(edges: .top)
 
-            // Bottom CTA
             bottomCTA
         }
         .background(Color.hairBg)
         .navigationBarHidden(true)
-        .overlay(alignment: .top) {
-            navBar
-        }
+        .overlay(alignment: .top) { navBar }
         .sheet(isPresented: $showPicker) {
             PhotoPickerSheet(isPresented: $showPicker) { image in
                 appState.selectedPhoto = image
             }
         }
+        .sheet(isPresented: $showPhotoPreview) {
+            if let photo = appState.selectedPhoto {
+                FullscreenImageSheet(image: photo)
+            }
+        }
+        .sheet(isPresented: $showSampleFullscreen) {
+            if !sampleUIImages.isEmpty {
+                FullscreenCarouselSheet(images: sampleUIImages, startIndex: carouselPage)
+            }
+        }
     }
+
+    // MARK: - Hero
+
+    @ViewBuilder
+    private var heroArea: some View {
+        if sampleUIImages.isEmpty {
+            StyleHeroView(style: style)
+                .aspectRatio(16/9, contentMode: .fit)
+        } else {
+            ZStack(alignment: .bottom) {
+                TabView(selection: $carouselPage) {
+                    ForEach(sampleUIImages.indices, id: \.self) { i in
+                        Image(uiImage: sampleUIImages[i])
+                            .resizable()
+                            .scaledToFill()
+                            .tag(i)
+                            .onTapGesture { showSampleFullscreen = true }
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .aspectRatio(16/9, contentMode: .fit)
+
+                // Page dots
+                if sampleUIImages.count > 1 {
+                    HStack(spacing: 5) {
+                        ForEach(sampleUIImages.indices, id: \.self) { i in
+                            Circle()
+                                .fill(i == carouselPage ? Color.white : Color.white.opacity(0.45))
+                                .frame(width: i == carouselPage ? 7 : 5, height: i == carouselPage ? 7 : 5)
+                        }
+                    }
+                    .padding(.bottom, 10)
+                    .animation(.easeInOut(duration: 0.15), value: carouselPage)
+                }
+            }
+        }
+    }
+
+    // MARK: - Nav bar
 
     private var navBar: some View {
         ScreenNav(
@@ -93,9 +142,13 @@ struct StyleDetailView: View {
         .background(Color.hairBg)
     }
 
+    // MARK: - Tips
+
     private var tipsSection: some View {
         VStack(spacing: 0) {
-            Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { tipsExpanded.toggle() } }) {
+            Button(action: {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { tipsExpanded.toggle() }
+            }) {
                 HStack {
                     Label("Photo Tips", systemImage: "camera")
                         .font(.system(size: 14, weight: .semibold))
@@ -132,6 +185,8 @@ struct StyleDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
+    // MARK: - Bottom CTA
+
     private var bottomCTA: some View {
         VStack(spacing: 6) {
             PrimaryButton(
@@ -141,13 +196,11 @@ struct StyleDetailView: View {
                 disabled: !appState.hasPhoto,
                 action: onGenerate
             )
-
             Text(appState.hasPhoto
                  ? "Uses 1 credit · You have \(appState.credits) remaining"
                  : "Upload a photo to continue")
                 .font(.system(size: 12))
                 .foregroundStyle(Color.hairTextSec)
-
             Button(action: onCustom) {
                 Text("Try a Custom Style Instead")
                     .font(.system(size: 14))
@@ -166,5 +219,64 @@ struct StyleDetailView: View {
             )
             .ignoresSafeArea()
         )
+    }
+}
+
+// MARK: - Fullscreen sheets
+
+private struct FullscreenImageSheet: View {
+    let image: UIImage
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Color.black.ignoresSafeArea()
+
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            Button(action: { dismiss() }) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .padding(20)
+            }
+        }
+        .presentationBackground(.black)
+    }
+}
+
+private struct FullscreenCarouselSheet: View {
+    let images: [UIImage]
+    let startIndex: Int
+    @Environment(\.dismiss) private var dismiss
+    @State private var page: Int = 0
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Color.black.ignoresSafeArea()
+
+            TabView(selection: $page) {
+                ForEach(images.indices, id: \.self) { i in
+                    Image(uiImage: images[i])
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .tag(i)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: images.count > 1 ? .always : .never))
+
+            Button(action: { dismiss() }) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .padding(20)
+            }
+        }
+        .presentationBackground(.black)
+        .onAppear { page = startIndex }
     }
 }

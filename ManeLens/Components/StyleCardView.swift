@@ -9,8 +9,8 @@ struct StyleCardView: View {
     var body: some View {
         Button(action: action) {
             ZStack(alignment: .bottom) {
-                // Card image
-                StyleHeroView(style: style)
+                // Card image — real sample photo if available, else illustration
+                cardImage
                     .aspectRatio(5/6, contentMode: .fill)
                     .clipped()
 
@@ -32,7 +32,7 @@ struct StyleCardView: View {
                 .padding(.horizontal, 10)
                 .padding(.bottom, 10)
 
-                // Category tag (top-left)
+                // Category + NEW badge (top row)
                 VStack {
                     HStack {
                         Text(style.category)
@@ -69,5 +69,16 @@ struct StyleCardView: View {
                 .onChanged { _ in pressed = true }
                 .onEnded { _ in pressed = false }
         )
+    }
+
+    @ViewBuilder
+    private var cardImage: some View {
+        if let first = style.sampleImages.first, let uiImage = UIImage(named: first) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+        } else {
+            StyleHeroView(style: style)
+        }
     }
 }

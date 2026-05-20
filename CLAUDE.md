@@ -246,9 +246,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-20
-**Current State:** SESSION 9 COMPLETE — UI bugs fixed, Settings cleaned up, IAPs working on real device. Session 10 needed for remaining bugs + TestFlight.
-
-**Last commit:** `9d06190` — Fix UI bugs: nav bar, slider crop, scissors text, Save/feedback wiring, Settings cleanup
+**Current State:** SESSION 10 COMPLETE — all code fixes done, 20 styles in catalog, sample image infrastructure built. Remaining: add real photo assets, privacy/terms HTML pages, TestFlight build.
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
@@ -256,9 +254,13 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 - StoreKit purchase flow works on device with sandbox account
 - PaywallView: all 4 packs showing, safeAreaInset bottom CTA, no empty gap
 - ResultView: before/after slider 4/5 portrait ratio, ✂️ emoji, Save→exportToPhotos, Love it→AppStore review, share removed from nav
-- SettingsView: cleaned up — removed non-functional Appearance/Haptic toggles, removed Danger Zone, Privacy/Terms point to GitHub Pages URLs
+- SettingsView: cleaned up — removed non-functional Appearance/Haptic toggles, removed Danger Zone, Privacy/Terms point to GitHub Pages URLs, removed Clear History (moved to HistoryView)
 - CustomPromptView: header padding fixed (56pt top)
-- StyleDetailView: nav bar solid white background
+- StyleDetailView: nav bar solid white background, swipeable sample image carousel (with HairFaceView fallback), fullscreen tap on carousel images, tapping loaded photo shows fullscreen preview not picker
+- StyleCardView: shows first sample image when assets available, HairFaceView fallback
+- HomeView: Male/Female filter chips alongside category chips
+- HistoryView: Edit mode with multi-select, "Delete (N)" + "Clear All" toolbar buttons
+- HairStyle catalog: 20 styles (6 original + 14 new) with gender field — Male/Female/Unisex
 
 **iOS 26 SDK / StoreKit notes:**
 - Local .storekit config file returns 0 products on iOS 26 simulator — known bug. Use real device + App Store Connect sandbox for IAP testing
@@ -270,43 +272,31 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 - All showing "Missing Metadata" — need: price tier + English localization + review screenshot per IAP
 - Products DO load on real device even in Missing Metadata state (sandbox)
 
-**PENDING BEFORE SUBMISSION — Session 10:**
+**Sample Images — how to add:**
+The `sampleImages: [String]` field in HairStyle is wired up. To populate:
+1. Add JPEG images to `Assets.xcassets` named `sample_{styleKey}_1`, `sample_{styleKey}_2` etc.
+   - Example: `sample_wolf_cut_1`, `sample_wolf_cut_2` for the Korean Wolf Cut style
+2. Update the `sampleImages` array in `HairStyle.catalog` for that style
+3. StyleCardView and StyleDetailView carousel will automatically use them
+4. Good sources: generate a few styles in the app, save results; or use Pexels/Unsplash free-license photos
 
-CODE FIXES (bugs discovered Sessions 8–9):
-1. HomeView: grid not scrollable — verify ScrollView wraps LazyVGrid
-2. HomeView: add Male/Female gender filter chips alongside All/Wedding/Salon/Casual/Bold
-3. HistoryView: add multi-select + delete selected + "Clear All" toolbar button; remove Clear History from Settings
-4. StyleDetailView: tapping already-loaded photo shows fullscreen preview (QuickLook or sheet), not re-open picker
-5. Add 10+ more styles to StyleCatalog.json — mix male/female/wedding/casual/bold (currently only ~8 styles)
-6. StyleDetailView: hero image is HairFaceView illustration (dark) — replace with real bundled sample image per style (see Feature below)
+**PENDING BEFORE SUBMISSION — Session 11:**
 
-NEW FEATURE — Style Sample Images + Swipeable Carousel (HIGH PRIORITY for V1):
-- **Problem:** StyleCardView and StyleDetailView use HairFaceView (a programmatic hair illustration) — looks generic, not inspiring
-- **Solution:**
-  - Add `sampleImages: [String]` field to HairStyle model — array of bundled asset names OR remote URLs
-  - StyleCardView: show first sample image as card thumbnail (real photo of that hairstyle on a person)
-  - StyleDetailView hero area: replace single image with TabView-based swipeable carousel of 2–4 sample images showing the style on different people/angles
-  - Each sample image has a page indicator dots below the carousel
-  - Tapping any sample image opens fullscreen photo viewer (sheet with ZoomableImageView)
-- **Assets:** Bundle 2–4 sample JPEGs per style in Assets.xcassets — name them `sample_{styleId}_1`, `sample_{styleId}_2` etc.
-- **Fallback:** If no images bundled → fall back to existing HairFaceView illustration (keeps backward compat)
-- **Impact:** This is the single biggest trust-builder before users spend credits — seeing real results on real people
-- **File changes:** `HairStyle.swift` (add sampleImages field), `StyleCatalog.json` (add image names), `StyleCardView.swift` (show real image), `StyleDetailView.swift` (carousel hero), `HairFaceView.swift` (keep as fallback), add image assets
-
-MANUAL / CONTENT:
-7. Create hairLens-privacy.html on https://github.com/shubhamraj2202/shubhamraj2202.github.io (model after veggieLens-privacy.html)
-8. Create hairLens-terms.html (model after veggieLens-terms.html)
-9. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
-10. App Store screenshots — 6 screens at 1320×2868 (6.9") and 1179×2556 (6.3")
-11. Bump build to 3 → Archive → Upload to TestFlight
-12. Add app to App Store version page + attach IAPs to version before submitting
+CONTENT / MANUAL:
+1. Add real sample photos to Assets.xcassets + populate sampleImages arrays (biggest UX impact)
+2. Create hairLens-privacy.html on https://github.com/shubhamraj2202/shubhamraj2202.github.io (model after veggieLens-privacy.html)
+3. Create hairLens-terms.html (model after veggieLens-terms.html)
+4. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
+5. App Store screenshots — 6 screens at 1320×2868 (6.9") and 1179×2556 (6.3")
+6. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
+7. Add app to App Store version page + attach IAPs to version before submitting
 
 **Legal URLs (once pages created):**
 - Privacy: https://shubhamraj2202.github.io/hairLens-privacy.html
 - Terms: https://shubhamraj2202.github.io/hairLens-terms.html
 - These are already set in SettingsView.swift — just need the HTML pages created
 
-**Complete Bug List from Sessions 8–9 (for reference):**
+**Complete Bug List from Sessions 8–10 (for reference):**
 | # | View | Bug | Status |
 |---|------|-----|--------|
 | 1 | ResultView | "scissors" renders as text (not SF symbol) | FIXED ✅ |
@@ -319,13 +309,13 @@ MANUAL / CONTENT:
 | 8 | PaywallView | Large empty gap below pack cards | FIXED ✅ |
 | 9 | SettingsView | Non-functional toggles (Appearance/Haptic) | FIXED ✅ (removed) |
 | 10 | SettingsView | Danger Zone confusing | FIXED ✅ (simplified) |
-| 11 | HomeView | Grid not scrollable | PENDING ⏳ |
-| 12 | HomeView | No Male/Female filter | PENDING ⏳ |
-| 13 | HistoryView | No delete/clear all | PENDING ⏳ |
-| 14 | StyleDetailView | Tap photo → re-opens picker not fullscreen | PENDING ⏳ |
-| 15 | All style cards | Illustration instead of real sample photos | PENDING ⏳ (new feature) |
+| 11 | HomeView | Grid not scrollable | FIXED ✅ (ScrollView already wrapped LazyVGrid) |
+| 12 | HomeView | No Male/Female filter | FIXED ✅ (gender field + filter chips) |
+| 13 | HistoryView | No delete/clear all | FIXED ✅ (Edit mode + toolbar) |
+| 14 | StyleDetailView | Tap photo → re-opens picker not fullscreen | FIXED ✅ (onTapPhoto → fullscreen sheet) |
+| 15 | All style cards | Illustration instead of real sample photos | FIXED ✅ (infrastructure built, assets needed) |
 
-**Next Step:** Session 10 — code fixes #11-15 + style sample images feature + privacy/terms HTML pages + TestFlight build.
+**Next Step:** Session 11 — add sample photo assets, create privacy/terms HTML, complete IAP metadata, TestFlight.
 
 ---
 

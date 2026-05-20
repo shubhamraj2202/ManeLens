@@ -4,6 +4,7 @@ struct PhotoUploadZone: View {
     let photo: UIImage?
     let hairColor: Color
     let onTap: () -> Void
+    var onTapPhoto: (() -> Void)? = nil  // called when tapping an already-loaded photo
     let onRemove: () -> Void
 
     var body: some View {
@@ -14,6 +15,7 @@ struct PhotoUploadZone: View {
                     .scaledToFill()
                     .frame(height: 180)
                     .clipped()
+                    .onTapGesture { onTapPhoto?() }
 
                 VStack {
                     HStack {

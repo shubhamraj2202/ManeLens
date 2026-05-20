@@ -13,7 +13,9 @@ struct HomeView: View {
 
     private var filteredStyles: [HairStyle] {
         HairStyle.catalog.filter { style in
-            (selectedCategory == "All" || style.category == selectedCategory) &&
+            (selectedCategory == "All"
+                || style.category == selectedCategory
+                || style.gender == selectedCategory) &&
             (searchText.isEmpty || style.name.localizedCaseInsensitiveContains(searchText))
         }
     }
