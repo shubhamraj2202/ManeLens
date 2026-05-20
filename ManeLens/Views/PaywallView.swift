@@ -146,7 +146,7 @@ private struct PackCard: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
-                .background(selected ? Color.hairPurpleAlpha : Color.white)
+                .background(selected ? Color.hairPurpleAlpha : Color.hairBg)
                 .clipShape(RoundedRectangle(cornerRadius: DS.radiusCard))
                 .overlay(
                     RoundedRectangle(cornerRadius: DS.radiusCard)

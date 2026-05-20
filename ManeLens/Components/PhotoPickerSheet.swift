@@ -128,7 +128,7 @@ private struct SourceRow: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(Color.white)
+        .background(Color.hairBg)
         .clipShape(RoundedRectangle(cornerRadius: 14))
 
         if let action {

@@ -116,6 +116,7 @@ struct HomeView: View {
             .padding(.top, 4)
             .padding(.bottom, 16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var customStyleFAB: some View {

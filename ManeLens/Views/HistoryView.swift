@@ -154,7 +154,7 @@ struct HistoryView: View {
         .padding(.top, 12)
         .padding(.bottom, 36)
         .background(
-            LinearGradient(colors: [.white.opacity(0), .white], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.3))
+            LinearGradient(colors: [Color.hairBg.opacity(0), Color.hairBg], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.3))
                 .ignoresSafeArea()
         )
     }
@@ -218,9 +218,9 @@ private struct HistoryCard: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
-                .background(Color.white)
+                .background(Color.hairBg)
             }
-            .background(Color.white)
+            .background(Color.hairBg)
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .shadow(color: .black.opacity(isSelected ? 0.20 : 0.10), radius: 5, x: 0, y: 2)
             .overlay(

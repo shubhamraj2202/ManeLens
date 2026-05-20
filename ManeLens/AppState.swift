@@ -22,10 +22,10 @@ enum ThemeMode: String, CaseIterable {
 }
 
 struct GenerationRecord: Identifiable {
-    let id = UUID()
+    var id: UUID = UUID()
     let style: HairStyle
     var liked: Bool = false
-    let date: Date = .now
+    var date: Date = .now
     let originalImage: UIImage?
     let resultImage: UIImage?
 }
@@ -38,7 +38,13 @@ class AppState {
     var generatedImage: UIImage? = nil
     var customPromptText: String = ""
     var generationError: String? = nil
-    var history: [GenerationRecord] = []
+    var history: [GenerationRecord] = [] {
+        didSet { HistoryStore.shared.save(history) }
+    }
+
+    init() {
+        self.history = HistoryStore.shared.load()
+    }
 
     var themeMode: ThemeMode = ThemeMode(rawValue: UserDefaults.standard.string(forKey: "hairlens_theme") ?? "system") ?? .system {
         didSet { UserDefaults.standard.set(themeMode.rawValue, forKey: "hairlens_theme") }
