@@ -97,7 +97,7 @@ struct PrimaryButton: View {
         case .secondary:           .hairPurple
         case .tertiary:            .hairPurple
         case .destructive:         Color(red: 0.937, green: 0.267, blue: 0.267)
-        case .white:               .hairText
+        case .white:               Color(red: 0.1, green: 0.05, blue: 0.2)
         }
     }
 

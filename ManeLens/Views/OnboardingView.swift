@@ -97,14 +97,7 @@ struct OnboardingView: View {
 
                     // CTA
                     if currentSlide == slides.count - 1 {
-                        VStack(spacing: 12) {
-                            PrimaryButton(title: "Get 3 Free Generations", icon: "✨", variant: .gradient, action: onDone)
-                            Button(action: onDone) {
-                                Text("Continue without account")
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(.white.opacity(0.55))
-                            }
-                        }
+                        PrimaryButton(title: "Get 3 Free Generations", icon: "✨", variant: .gradient, action: onDone)
                     } else {
                         PrimaryButton(title: "Continue", variant: .white) {
                             withAnimation(.easeInOut(duration: 0.3)) {
