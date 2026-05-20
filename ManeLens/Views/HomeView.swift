@@ -124,6 +124,7 @@ struct HomeView: View {
             .padding(.horizontal, DS.paddingPage)
             .padding(.bottom, 110)
         }
+        .frame(maxHeight: .infinity)
     }
 
     private var customStyleFAB: some View {
