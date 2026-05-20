@@ -272,27 +272,60 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 
 **PENDING BEFORE SUBMISSION — Session 10:**
 
-CODE FIXES:
+CODE FIXES (bugs discovered Sessions 8–9):
 1. HomeView: grid not scrollable — verify ScrollView wraps LazyVGrid
-2. HomeView: add Male/Female gender filter chips
-3. HistoryView: add multi-select + delete + "Clear All" toolbar button
-4. StyleDetailView: tapping loaded photo → fullscreen preview (not re-open picker)
-5. Add more hair styles to StyleCatalog.json (at least 10 more)
+2. HomeView: add Male/Female gender filter chips alongside All/Wedding/Salon/Casual/Bold
+3. HistoryView: add multi-select + delete selected + "Clear All" toolbar button; remove Clear History from Settings
+4. StyleDetailView: tapping already-loaded photo shows fullscreen preview (QuickLook or sheet), not re-open picker
+5. Add 10+ more styles to StyleCatalog.json — mix male/female/wedding/casual/bold (currently only ~8 styles)
+6. StyleDetailView: hero image is HairFaceView illustration (dark) — replace with real bundled sample image per style (see Feature below)
+
+NEW FEATURE — Style Sample Images + Swipeable Carousel (HIGH PRIORITY for V1):
+- **Problem:** StyleCardView and StyleDetailView use HairFaceView (a programmatic hair illustration) — looks generic, not inspiring
+- **Solution:**
+  - Add `sampleImages: [String]` field to HairStyle model — array of bundled asset names OR remote URLs
+  - StyleCardView: show first sample image as card thumbnail (real photo of that hairstyle on a person)
+  - StyleDetailView hero area: replace single image with TabView-based swipeable carousel of 2–4 sample images showing the style on different people/angles
+  - Each sample image has a page indicator dots below the carousel
+  - Tapping any sample image opens fullscreen photo viewer (sheet with ZoomableImageView)
+- **Assets:** Bundle 2–4 sample JPEGs per style in Assets.xcassets — name them `sample_{styleId}_1`, `sample_{styleId}_2` etc.
+- **Fallback:** If no images bundled → fall back to existing HairFaceView illustration (keeps backward compat)
+- **Impact:** This is the single biggest trust-builder before users spend credits — seeing real results on real people
+- **File changes:** `HairStyle.swift` (add sampleImages field), `StyleCatalog.json` (add image names), `StyleCardView.swift` (show real image), `StyleDetailView.swift` (carousel hero), `HairFaceView.swift` (keep as fallback), add image assets
 
 MANUAL / CONTENT:
-6. Create hairLens-privacy.html on https://github.com/shubhamraj2202/shubhamraj2202.github.io (model after veggieLens-privacy.html)
-7. Create hairLens-terms.html (model after veggieLens-terms.html)
-8. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
-9. App Store screenshots — 6 screens at 1320×2868 (6.9") and 1179×2556 (6.3")
-10. Bump build to 3 → Archive → Upload to TestFlight
-11. Add app to App Store version page + attach IAPs to version before submitting
+7. Create hairLens-privacy.html on https://github.com/shubhamraj2202/shubhamraj2202.github.io (model after veggieLens-privacy.html)
+8. Create hairLens-terms.html (model after veggieLens-terms.html)
+9. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
+10. App Store screenshots — 6 screens at 1320×2868 (6.9") and 1179×2556 (6.3")
+11. Bump build to 3 → Archive → Upload to TestFlight
+12. Add app to App Store version page + attach IAPs to version before submitting
 
 **Legal URLs (once pages created):**
 - Privacy: https://shubhamraj2202.github.io/hairLens-privacy.html
 - Terms: https://shubhamraj2202.github.io/hairLens-terms.html
 - These are already set in SettingsView.swift — just need the HTML pages created
 
-**Next Step:** Session 10 — remaining code fixes + privacy/terms HTML pages + TestFlight build.
+**Complete Bug List from Sessions 8–9 (for reference):**
+| # | View | Bug | Status |
+|---|------|-----|--------|
+| 1 | ResultView | "scissors" renders as text (not SF symbol) | FIXED ✅ |
+| 2 | ResultView | Share button duplicated in nav + action bar | FIXED ✅ |
+| 3 | ResultView | Slider aspect ratio crops face | FIXED ✅ |
+| 4 | ResultView | Save button did nothing | FIXED ✅ (saves to Photos) |
+| 5 | ResultView | "Love it" did nothing | FIXED ✅ (App Store review) |
+| 6 | StyleDetailView | Nav bar dark over hero image | FIXED ✅ |
+| 7 | CustomPromptView | Header hidden under nav bar | FIXED ✅ |
+| 8 | PaywallView | Large empty gap below pack cards | FIXED ✅ |
+| 9 | SettingsView | Non-functional toggles (Appearance/Haptic) | FIXED ✅ (removed) |
+| 10 | SettingsView | Danger Zone confusing | FIXED ✅ (simplified) |
+| 11 | HomeView | Grid not scrollable | PENDING ⏳ |
+| 12 | HomeView | No Male/Female filter | PENDING ⏳ |
+| 13 | HistoryView | No delete/clear all | PENDING ⏳ |
+| 14 | StyleDetailView | Tap photo → re-opens picker not fullscreen | PENDING ⏳ |
+| 15 | All style cards | Illustration instead of real sample photos | PENDING ⏳ (new feature) |
+
+**Next Step:** Session 10 — code fixes #11-15 + style sample images feature + privacy/terms HTML pages + TestFlight build.
 
 ---
 
