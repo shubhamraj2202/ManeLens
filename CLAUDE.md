@@ -246,8 +246,8 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 
 ## Session Status
 
-**Last Updated:** 2026-05-20
-**Current State:** SESSION 14 COMPLETE — Fixed TestFlight install issue by lowering `IPHONEOS_DEPLOYMENT_TARGET` from `26.0` to `18.0`. Added documentation about Xcode Cloud build numbering. Build succeeds cleanly.
+**Last Updated:** 2026-05-26
+**Current State:** SESSION 15 IN PROGRESS — PaywallView dark mode fixed (card bg + gradient). TestFlight install issue confirmed resolved (deployment target 18.0). Exploring competitor-inspired UI improvements: sectioned home rows, before/after card previews, promo banner.
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
