@@ -378,6 +378,10 @@ VStack(spacing: 0) {
 
 **Next Step:** Session 17 — paste Profiles+Timeline implementation prompt into fresh Claude Code session. Then IAP metadata + screenshots + TestFlight.
 
+**IMPORTANT — Session 17 start ritual:**
+User will provide a Claude Design export URL (like `https://api.anthropic.com/v1/design/h/...`).
+Fetch it using WebFetch, decompress (it's a .tar.gz), extract, read README.md + chats/ + project files BEFORE implementing anything. The design files are the source of truth for all new screen layouts, colors, and interactions. Implement pixel-perfectly in SwiftUI matching the HTML/CSS prototype.
+
 
 ---
 
