@@ -246,8 +246,8 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 
 ## Session Status
 
-**Last Updated:** 2026-05-26
-**Current State:** SESSION 15 IN PROGRESS — PaywallView dark mode fixed (card bg + gradient). TestFlight install issue confirmed resolved (deployment target 18.0). Exploring competitor-inspired UI improvements: sectioned home rows, before/after card previews, promo banner.
+**Last Updated:** 2026-05-27
+**Current State:** SESSION 15 COMPLETED (Nearly Done) — 39 out of 40 photorealistic sample style images successfully generated, processed into Xcode Assets, committed, and pushed to GitHub. Hit Gemini Imagen quota limit on the very last image (sample_reception_waves_2), which will reset in ~11 hours.
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
@@ -263,26 +263,16 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 - HomeView: Male/Female filter chips alongside category chips
 - HistoryView: Edit mode with multi-select, "Delete (N)" + "Clear All" toolbar buttons
 - HairStyle catalog: 20 styles (6 original + 14 new) with gender field — Male/Female/Unisex
-- **Sample Images Integration:** 9 styles have real, high-quality, photorealistic models in xcassets:
-  1. `indian_groom_slick` (id: 1) -> 2 images (sample_indian_groom_slick_1, sample_indian_groom_slick_2)
-  2. `indian_wedding_updo` (id: 3) -> 1 image (sample_indian_wedding_updo_1)
-  3. `french_crop_fade` (id: 4) -> 2 images (sample_french_crop_fade_1, sample_french_crop_fade_2)
-  4. `buzz_cut` (id: 7) -> 2 images (sample_buzz_cut_1, sample_buzz_cut_2)
-  5. `classic_pompadour` (id: 8) -> 2 images (sample_classic_pompadour_1, sample_classic_pompadour_2)
-  6. `man_bun` (id: 9) -> 2 images (sample_man_bun_1, sample_man_bun_2)
-  7. `disconnected_undercut` (id: 10) -> 2 images (sample_disconnected_undercut_1, sample_disconnected_undercut_2)
-  8. `textured_quiff` (id: 11) -> 2 images (sample_textured_quiff_1, sample_textured_quiff_2)
-  9. `ivy_league` (id: 20) -> 2 images (sample_ivy_league_1, sample_ivy_league_2)
+- **Sample Images Integration:** 39 out of 40 high-quality, photorealistic sample images fully integrated into Assets.xcassets and HairStyle.swift:
+  - 8 male styles (16 images): `indian_groom_slick`, `french_crop_fade`, `classic_pompadour`, `man_bun`, `disconnected_undercut`, `buzz_cut`, `textured_quiff`, `ivy_league` — ALL 2/2 completed
+  - 11 female/unisex styles (23 images): `wolf_cut`, `indian_wedding_updo`, `beach_blonde_waves`, `balayage_highlights`, `curtain_bangs`, `pixie_cut`, `classic_bob`, `braided_bridal_updo`, `long_straight`, `side_swept_bangs`, `platinum_blonde` — ALL 2/2 completed, `reception_waves` has 1/2 completed (waiting on quota reset for sample_reception_waves_2)
+- **Legal Pages:** Completed and pushed to `shubhamraj2202.github.io` (`hairLens-privacy.html`, `hairLens-terms.html`, `hairLens-support.html`)
 
 **iOS 26 SDK / StoreKit notes:**
 - Local .storekit config file returns 0 products on iOS 26 simulator — known bug. Use real device + App Store Connect sandbox for IAP testing
 - All iOS 26 SDK breaking changes already fixed (see commit history)
 - SourceKit cross-file errors are always false alarms with PBXFileSystemSynchronizedRootGroup
-
-**IAP Status (App Store Connect):**
-- All 4 IAPs created: credits_5 / credits_20 / credits_60 / credits_200
-- All showing "Missing Metadata" — need: price tier + English localization + review screenshot per IAP
-- Products DO load on real device even in Missing Metadata state (sandbox)
+- All IAPs created in App Store Connect (credits_5 / credits_20 / credits_60 / credits_200)
 
 **PENDING BEFORE SUBMISSION — Session 12:**
 
