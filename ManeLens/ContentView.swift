@@ -15,7 +15,7 @@ enum Screen {
     case profiles
     case profileDetail(UUID)
     case timelineEntryDetail(UUID, UUID)   // profileId, entryId
-    case faceAnalyser(UUID, UIImage)       // profileId, photo
+    case faceAnalyser(UUID, UIImage, UUID?) // profileId, photo, optional sourceEntryId
 }
 
 struct ContentView: View {
@@ -172,7 +172,7 @@ struct ContentView: View {
                         onAnalyse: { prof, photo in
                             guard appState.credits > 0 else { navigate(to: .paywall); return }
                             appState.consumeCredit()
-                            navigate(to: .faceAnalyser(prof.id, photo))
+                            navigate(to: .faceAnalyser(prof.id, photo, nil))
                         },
                         onUseForStyle: { photo in
                             appState.selectedPhoto = photo
@@ -193,10 +193,10 @@ struct ContentView: View {
                         profile: profile,
                         entryId: entryId,
                         onBack: { navigateBack() },
-                        onAnalyse: { prof, photo in
+                        onAnalyse: { prof, photo, sourceEntryId in
                             guard appState.credits > 0 else { navigate(to: .paywall); return }
                             appState.consumeCredit()
-                            navigate(to: .faceAnalyser(prof.id, photo))
+                            navigate(to: .faceAnalyser(prof.id, photo, sourceEntryId))
                         },
                         onGenerateStyle: { photo in
                             appState.selectedPhoto = photo
@@ -209,7 +209,7 @@ struct ContentView: View {
                     .transition(.move(edge: .trailing))
                 }
 
-            case .faceAnalyser(let profileId, let photo):
+            case .faceAnalyser(let profileId, let photo, let sourceEntryId):
                 if let profile = appState.profiles.first(where: { $0.id == profileId }) {
                     FaceAnalyserView(
                         appState: appState,
@@ -224,7 +224,7 @@ struct ContentView: View {
                             navigate(to: .styleDetail(style))
                         },
                         onSaveToTimeline: { result in
-                            saveAnalysisToTimeline(result: result, profile: profile, photo: photo)
+                            saveAnalysisToTimeline(result: result, profile: profile, photo: photo, sourceEntryId: sourceEntryId)
                             navigateBack()
                         }
                     )
@@ -259,15 +259,22 @@ struct ContentView: View {
 
     // MARK: - Save analysis result as timeline entry
 
-    private func saveAnalysisToTimeline(result: FaceAnalysisResult, profile: PersonProfile, photo: UIImage) {
-        let entryId = UUID()
-        let path = ProfilesStore.shared.savePhoto(photo, profileId: profile.id, entryId: entryId)
+    private func saveAnalysisToTimeline(result: FaceAnalysisResult, profile: PersonProfile, photo: UIImage, sourceEntryId: UUID?) {
         let topStyle = result.recommendations.first?.styleKey
         let note = "Face analysis — \(result.faceShapeDisplay) face, \(result.undertoneDisplay) undertone. Top pick: \(topStyle ?? "—")"
-        let entry = TimelineEntry(id: entryId, date: .now, photoPath: path, note: note, styleKey: topStyle)
-        if let idx = appState.profiles.firstIndex(where: { $0.id == profile.id }) {
-            appState.profiles[idx].entries.insert(entry, at: 0)
+        guard let pi = appState.profiles.firstIndex(where: { $0.id == profile.id }) else { return }
+        // Update existing entry if this analysis came from a timeline photo
+        if let srcId = sourceEntryId,
+           let ei = appState.profiles[pi].entries.firstIndex(where: { $0.id == srcId }) {
+            appState.profiles[pi].entries[ei].note = note
+            if let key = topStyle { appState.profiles[pi].entries[ei].styleKey = key }
+            return
         }
+        // Otherwise create a new entry
+        let entryId = UUID()
+        let path = ProfilesStore.shared.savePhoto(photo, profileId: profile.id, entryId: entryId)
+        let entry = TimelineEntry(id: entryId, date: .now, photoPath: path, note: note, styleKey: topStyle)
+        appState.profiles[pi].entries.insert(entry, at: 0)
     }
 
     // MARK: - Generation
@@ -347,7 +354,7 @@ struct ContentView: View {
         case .profiles:                          return "profiles"
         case .profileDetail(let id):             return "profileDetail-\(id)"
         case .timelineEntryDetail(let p, let e): return "entry-\(p)-\(e)"
-        case .faceAnalyser(let id, _):           return "analyser-\(id)"
+        case .faceAnalyser(let id, _, _):         return "analyser-\(id)"
         }
     }
 }

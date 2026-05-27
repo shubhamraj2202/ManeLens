@@ -10,12 +10,12 @@ struct FaceAnalyserView: View {
     var onTryStyle: (HairStyle) -> Void
     var onSaveToTimeline: (FaceAnalysisResult) -> Void
 
-    @State private var phase: Phase = .analysing
+    @State private var phase: Phase = .ready
     @State private var stepIndex: Int = 0
     @State private var barProgress: Double = 0
     @State private var result: FaceAnalysisResult? = nil
 
-    enum Phase { case analysing, results }
+    enum Phase { case ready, analysing, results }
 
     private let steps: [(icon: String, label: String)] = [
         ("person.crop.rectangle", "Detecting face shape…"),
@@ -26,8 +26,80 @@ struct FaceAnalyserView: View {
 
     var body: some View {
         switch phase {
+        case .ready:     readyView
         case .analysing: analysingView
         case .results:   resultsView
+        }
+    }
+
+    // MARK: - State 0: Ready (confirmation gate)
+
+    private var readyView: some View {
+        ZStack(alignment: .topTrailing) {
+            LinearGradient(
+                colors: [Color.hairBg, Color.hairPurpleLight],
+                startPoint: .top, endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 28) {
+                Spacer()
+
+                Image(uiImage: photo)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.hairPurple, lineWidth: 3))
+                    .overlay(
+                        Circle()
+                            .stroke(Color.hairPurpleAlpha, lineWidth: 6)
+                            .frame(width: 132, height: 132)
+                    )
+
+                VStack(spacing: 8) {
+                    Text("Analyse \(profile.name.split(separator: " ").first.map(String.init) ?? "Face")")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(Color.hairText)
+                        .multilineTextAlignment(.center)
+                    Text("We'll detect your face shape, skin undertone, eye colour and recommend the best styles from our catalog.")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.hairTextSec)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 16)
+                }
+
+                VStack(spacing: 12) {
+                    ForEach(steps, id: \.label) { step in
+                        HStack(spacing: 12) {
+                            Image(systemName: step.icon)
+                                .font(.system(size: 15))
+                                .foregroundStyle(Color.hairPurple)
+                                .frame(width: 28)
+                            Text(step.label.replacingOccurrences(of: "…", with: ""))
+                                .font(.system(size: 13))
+                                .foregroundStyle(Color.hairText)
+                            Spacer()
+                        }
+                    }
+                }
+                .padding(.horizontal, 32)
+
+                Spacer()
+
+                PrimaryButton(title: "Start Analysis — 1 credit", icon: "wand.and.stars", variant: .gradient) {
+                    withAnimation(.easeInOut(duration: 0.3)) { phase = .analysing }
+                }
+                .padding(.horizontal, DS.paddingPage)
+                .padding(.bottom, 32)
+            }
+
+            Button("Cancel") { onBack() }
+                .font(.system(size: 14))
+                .foregroundStyle(Color.red.opacity(0.75))
+                .padding(.top, 16)
+                .padding(.trailing, DS.paddingPage)
         }
     }
 

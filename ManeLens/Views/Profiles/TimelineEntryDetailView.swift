@@ -5,7 +5,7 @@ struct TimelineEntryDetailView: View {
     var profile: PersonProfile
     var entryId: UUID
     var onBack: () -> Void
-    var onAnalyse: (PersonProfile, UIImage) -> Void
+    var onAnalyse: (PersonProfile, UIImage, UUID) -> Void
     var onGenerateStyle: (UIImage) -> Void
     var onDeleteEntry: () -> Void
 
@@ -16,7 +16,7 @@ struct TimelineEntryDetailView: View {
 
     init(appState: AppState, profile: PersonProfile, entryId: UUID,
          onBack: @escaping () -> Void,
-         onAnalyse: @escaping (PersonProfile, UIImage) -> Void,
+         onAnalyse: @escaping (PersonProfile, UIImage, UUID) -> Void,
          onGenerateStyle: @escaping (UIImage) -> Void,
          onDeleteEntry: @escaping () -> Void) {
         self.appState = appState
@@ -142,7 +142,7 @@ struct TimelineEntryDetailView: View {
                         HStack(spacing: 8) {
                             EntryActionButton(icon: "face.dashed", label: "Analyse", destructive: false) {
                                 if let img = ProfilesStore.shared.loadPhoto(path: entry.photoPath) {
-                                    onAnalyse(profileSnap, img)
+                                    onAnalyse(profileSnap, img, entry.id)
                                 }
                             }
                             EntryActionButton(icon: "wand.and.stars", label: "Generate", destructive: false) {

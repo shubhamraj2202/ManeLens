@@ -11,7 +11,7 @@ struct ProfilesListView: View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 ScreenNav(
-                    title: "Profiles",
+                    title: "Hair Timeline",
                     onBack: onBack,
                     trailing: AnyView(
                         Button("+ New") { showEdit = true }

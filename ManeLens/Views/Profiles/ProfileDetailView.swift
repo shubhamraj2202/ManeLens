@@ -204,13 +204,27 @@ struct ProfileDetailView: View {
                             }
                             .frame(width: 18)
 
-                            // Entry card
+                            // Entry card with long-press context menu
                             Button {
                                 onEntryDetail(profile, entry)
                             } label: {
                                 TimelineEntryCard(entry: entry)
                             }
                             .buttonStyle(.plain)
+                            .contextMenu {
+                                Button {
+                                    if let img = ProfilesStore.shared.loadPhoto(path: entry.photoPath) {
+                                        onAnalyse(profile, img)
+                                    }
+                                } label: {
+                                    Label("Analyse Face", systemImage: "face.dashed")
+                                }
+                                Button(role: .destructive) {
+                                    deleteEntry(entry: entry)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
                         }
                         .padding(.horizontal, DS.paddingPage)
                         .padding(.bottom, 16)
@@ -219,6 +233,14 @@ struct ProfileDetailView: View {
             }
         }
         .padding(.bottom, 80)
+    }
+
+    private func deleteEntry(entry: TimelineEntry) {
+        ProfilesStore.shared.deletePhoto(path: entry.photoPath)
+        if let gp = entry.generatedPhotoPath { ProfilesStore.shared.deletePhoto(path: gp) }
+        if let pi = appState.profiles.firstIndex(where: { $0.id == profileId }) {
+            appState.profiles[pi].entries.removeAll { $0.id == entry.id }
+        }
     }
 
     private func headerSubtitle(profile: PersonProfile) -> String {
