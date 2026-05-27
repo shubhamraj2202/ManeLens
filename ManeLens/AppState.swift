@@ -38,6 +38,8 @@ class AppState {
     var generatedImage: UIImage? = nil
     var customPromptText: String = ""
     var generationError: String? = nil
+    var homeSelectedCategory: String = "All"
+    var homeSearchText: String = ""
     var history: [GenerationRecord] = [] {
         didSet { HistoryStore.shared.save(history) }
     }

@@ -9,9 +9,6 @@ struct HomeView: View {
     var onHistory: () -> Void
     var onPaywall: () -> Void
 
-    @State private var selectedCategory = "All"
-    @State private var searchText = ""
-
     private var allStyles: [HairStyle] {
         HairStyle.catalog + appState.customStyles
     }
@@ -19,13 +16,13 @@ struct HomeView: View {
     private var filteredStyles: [HairStyle] {
         allStyles.filter { style in
             let matchesCategory: Bool
-            switch selectedCategory {
+            switch appState.homeSelectedCategory {
             case "All":       matchesCategory = true
             case "Favorites": matchesCategory = appState.isFavorite(style.id)
             case "Custom":    matchesCategory = style.isCustom
-            default:          matchesCategory = style.category == selectedCategory || style.gender == selectedCategory
+            default:          matchesCategory = style.category == appState.homeSelectedCategory || style.gender == appState.homeSelectedCategory
             }
-            let matchesSearch = searchText.isEmpty || style.name.localizedCaseInsensitiveContains(searchText)
+            let matchesSearch = appState.homeSearchText.isEmpty || style.name.localizedCaseInsensitiveContains(appState.homeSearchText)
             return matchesCategory && matchesSearch
         }
     }
@@ -96,7 +93,7 @@ struct HomeView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 14))
                 .foregroundStyle(Color.hairTextSec)
-            TextField("Search styles…", text: $searchText)
+            TextField("Search styles…", text: $appState.homeSearchText)
                 .font(.system(size: 15))
                 .foregroundStyle(Color.hairText)
         }
@@ -112,8 +109,8 @@ struct HomeView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(categories, id: \.self) { cat in
-                    CategoryChip(label: cat, selected: selectedCategory == cat) {
-                        selectedCategory = cat
+                    CategoryChip(label: cat, selected: appState.homeSelectedCategory == cat) {
+                        appState.homeSelectedCategory = cat
                     }
                 }
             }
