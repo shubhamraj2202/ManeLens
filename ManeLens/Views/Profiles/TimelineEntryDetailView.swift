@@ -150,6 +150,9 @@ struct TimelineEntryDetailView: View {
                                     onGenerateStyle(img)
                                 }
                             }
+                            EntryActionButton(icon: "person.crop.circle.badge.checkmark", label: "Set as DP", destructive: false) {
+                                setAsProfilePhoto(entry: entry)
+                            }
                             EntryActionButton(icon: "trash", label: "Delete", destructive: true) {
                                 deleteEntry(entry: entry)
                             }
@@ -194,6 +197,14 @@ struct TimelineEntryDetailView: View {
         } else {
             Color.hairBgOff
                 .aspectRatio(4/3, contentMode: .fit)
+        }
+    }
+
+    private func setAsProfilePhoto(entry: TimelineEntry) {
+        guard let img = ProfilesStore.shared.loadPhoto(path: entry.photoPath) else { return }
+        let path = ProfilesStore.shared.saveAvatarPhoto(img, profileId: profile.id)
+        if let pi = appState.profiles.firstIndex(where: { $0.id == profile.id }) {
+            appState.profiles[pi].avatarPhotoPath = path
         }
     }
 

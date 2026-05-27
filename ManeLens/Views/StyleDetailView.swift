@@ -48,8 +48,15 @@ struct StyleDetailView: View {
                                     hairColor: style.hairColor,
                                     onTap: { showPicker = true },
                                     onTapPhoto: { showPhotoPreview = true },
-                                    onRemove: { appState.selectedPhoto = nil }
+                                    onRemove: {
+                                        appState.selectedPhoto = nil
+                                        appState.activeProfileId = nil
+                                    }
                                 )
+
+                                if !appState.profiles.isEmpty {
+                                    profilePickerRow
+                                }
                             }
 
                             tipsSection
@@ -139,6 +146,45 @@ struct StyleDetailView: View {
             Image(systemName: appState.isFavorite(style.id) ? "heart.fill" : "heart")
                 .font(.system(size: 20))
                 .foregroundStyle(appState.isFavorite(style.id) ? Color.hairPink : Color.hairText)
+        }
+    }
+
+    // MARK: - Profile picker
+
+    private var profilePickerRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Or use a profile photo")
+                .font(.system(size: 12))
+                .foregroundStyle(Color.hairTextSec)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(appState.profiles) { profile in
+                        let isSelected = appState.activeProfileId == profile.id
+                        Button {
+                            if let path = profile.displayPhotoPath,
+                               let img = ProfilesStore.shared.loadPhoto(path: path) {
+                                appState.selectedPhoto = img
+                                appState.activeProfileId = profile.id
+                            }
+                        } label: {
+                            VStack(spacing: 4) {
+                                ProfileAvatarView(profile: profile, size: 44)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(isSelected ? Color.hairPurple : Color.clear, lineWidth: 2)
+                                    )
+                                Text(profile.name.split(separator: " ").first.map(String.init) ?? profile.name)
+                                    .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                                    .foregroundStyle(isSelected ? Color.hairPurple : Color.hairTextSec)
+                                    .lineLimit(1)
+                            }
+                            .frame(width: 52)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
         }
     }
 

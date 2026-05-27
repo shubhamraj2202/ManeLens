@@ -69,10 +69,14 @@ struct ProfileDetailView: View {
             .padding(.bottom, 48)
         }
         .sheet(isPresented: $showEdit) {
-            ProfileEditView(profile: profile) { name, notes in
+            ProfileEditView(profile: profile) { name, notes, avatarImage in
                 if let idx = appState.profiles.firstIndex(where: { $0.id == profile.id }) {
                     appState.profiles[idx].name = name
                     appState.profiles[idx].notes = notes
+                    if let img = avatarImage {
+                        let path = ProfilesStore.shared.saveAvatarPhoto(img, profileId: profile.id)
+                        appState.profiles[idx].avatarPhotoPath = path
+                    }
                 }
                 showEdit = false
             } onCancel: {

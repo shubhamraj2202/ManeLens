@@ -14,8 +14,10 @@ struct PersonProfile: Identifiable, Codable {
     var name: String
     var entries: [TimelineEntry] = []
     var notes: String = ""
+    var avatarPhotoPath: String? = nil
 
     var latestPhotoPath: String? { entries.first?.photoPath }
+    var displayPhotoPath: String? { avatarPhotoPath ?? latestPhotoPath }
     var entryCount: Int { entries.count }
 
     var sinceLabel: String? {

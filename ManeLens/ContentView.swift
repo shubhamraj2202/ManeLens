@@ -244,6 +244,19 @@ struct ContentView: View {
         }
     }
 
+    // MARK: - Save generation result to profile timeline
+
+    private func saveGenerationToProfile(profileId: UUID, photo: UIImage, result: UIImage, style: HairStyle?) {
+        guard let pi = appState.profiles.firstIndex(where: { $0.id == profileId }) else { return }
+        let entryId = UUID()
+        let origPath = ProfilesStore.shared.savePhoto(photo, profileId: profileId, entryId: entryId)
+        let genPath  = ProfilesStore.shared.savePhoto(result, profileId: profileId, entryId: UUID())
+        let note = style.map { "Generated: \($0.name)" } ?? "Custom style generation"
+        var entry = TimelineEntry(id: entryId, date: .now, photoPath: origPath, note: note, styleKey: style?.styleKey)
+        entry.generatedPhotoPath = genPath
+        appState.profiles[pi].entries.insert(entry, at: 0)
+    }
+
     // MARK: - Save analysis result as timeline entry
 
     private func saveAnalysisToTimeline(result: FaceAnalysisResult, profile: PersonProfile, photo: UIImage) {
@@ -283,6 +296,10 @@ struct ContentView: View {
 
             appState.generatedImage = result
             if let style { appState.recordGeneration(style: style, original: photo, result: result) }
+            if let profileId = appState.activeProfileId {
+                saveGenerationToProfile(profileId: profileId, photo: photo, result: result, style: style)
+                appState.activeProfileId = nil
+            }
             withAnimation { screen = .result(style) }
 
         } catch is CancellationError {

@@ -37,6 +37,15 @@ final class ProfilesStore {
         return name
     }
 
+    func saveAvatarPhoto(_ image: UIImage, profileId: UUID) -> String {
+        let name = "avatar_\(profileId.uuidString).jpg"
+        let url = photosDir().appendingPathComponent(name)
+        if let data = image.jpegData(compressionQuality: 0.85) {
+            try? data.write(to: url)
+        }
+        return name
+    }
+
     func loadPhoto(path: String) -> UIImage? {
         let url = photosDir().appendingPathComponent(path)
         guard let data = try? Data(contentsOf: url) else { return nil }

@@ -30,8 +30,12 @@ struct ProfilesListView: View {
             .background(Color.hairBgOff)
         }
         .sheet(isPresented: $showEdit) {
-            ProfileEditView(profile: nil) { name, notes in
-                let newProfile = PersonProfile(name: name, notes: notes)
+            ProfileEditView(profile: nil) { name, notes, avatarImage in
+                var newProfile = PersonProfile(name: name, notes: notes)
+                if let img = avatarImage {
+                    let path = ProfilesStore.shared.saveAvatarPhoto(img, profileId: newProfile.id)
+                    newProfile.avatarPhotoPath = path
+                }
                 appState.profiles.append(newProfile)
                 showEdit = false
             } onCancel: {
@@ -175,7 +179,7 @@ struct ProfileAvatarView: View {
     let size: CGFloat
 
     private var photo: UIImage? {
-        guard let path = profile.latestPhotoPath else { return nil }
+        guard let path = profile.displayPhotoPath else { return nil }
         return ProfilesStore.shared.loadPhoto(path: path)
     }
 

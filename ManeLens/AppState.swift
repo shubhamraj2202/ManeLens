@@ -39,6 +39,7 @@ class AppState {
     var customPromptText: String = ""
     var generationError: String? = nil
     var faceAnalysisError: String? = nil
+    var activeProfileId: UUID? = nil
     var homeSelectedCategory: String = "All"
     var homeSearchText: String = ""
     var history: [GenerationRecord] = [] {
