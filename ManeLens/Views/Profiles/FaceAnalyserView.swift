@@ -3,6 +3,7 @@ import SwiftUI
 // MARK: - FaceAnalyserView (two states: analysing → results)
 
 struct FaceAnalyserView: View {
+    @Bindable var appState: AppState
     let profile: PersonProfile
     let photo: UIImage
     var onBack: () -> Void
@@ -248,15 +249,20 @@ struct FaceAnalyserView: View {
 
     private func recommendationsSection(_ r: FaceAnalysisResult) -> some View {
         let firstName = profile.name.split(separator: " ").first.map(String.init) ?? "You"
+        let validRecs = r.recommendations.filter { $0.hairStyle != nil }
         return VStack(alignment: .leading, spacing: 12) {
             Text("Styles That Suit \(firstName)")
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(Color.hairText)
 
-            ForEach(Array(r.recommendations.enumerated()), id: \.element.id) { idx, rec in
-                RecommendationCard(rec: rec, rank: idx + 1, onTry: {
-                    if let style = rec.hairStyle { onTryStyle(style) }
-                })
+            ForEach(Array(validRecs.enumerated()), id: \.element.id) { idx, rec in
+                RecommendationCard(
+                    rec: rec,
+                    rank: idx + 1,
+                    isFavorited: appState.isFavorite(rec.hairStyle!.id),
+                    onFavourite: { appState.toggleFavorite(rec.hairStyle!.id) },
+                    onTry: { if let style = rec.hairStyle { onTryStyle(style) } }
+                )
             }
         }
     }
@@ -382,6 +388,8 @@ struct AnalysisStepRow: View {
 private struct RecommendationCard: View {
     let rec: StyleRecommendation
     let rank: Int
+    let isFavorited: Bool
+    let onFavourite: () -> Void
     let onTry: () -> Void
 
     private var gradientColors: [Color] {
@@ -434,7 +442,16 @@ private struct RecommendationCard: View {
                     }
                 }
                 Spacer()
-                Button("Try this", action: onTry)
+                // Favourite heart toggle
+                Button(action: onFavourite) {
+                    Image(systemName: isFavorited ? "heart.fill" : "heart")
+                        .font(.system(size: 16))
+                        .foregroundStyle(isFavorited ? Color.red : Color.hairTextSec)
+                }
+                .padding(.trailing, 6)
+
+                // Try with profile photo → goes to StyleDetailView with photo pre-loaded
+                Button("Try →", action: onTry)
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 12).padding(.vertical, 6)

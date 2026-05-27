@@ -212,6 +212,7 @@ struct ContentView: View {
             case .faceAnalyser(let profileId, let photo):
                 if let profile = appState.profiles.first(where: { $0.id == profileId }) {
                     FaceAnalyserView(
+                        appState: appState,
                         profile: profile,
                         photo: photo,
                         onBack: {
@@ -219,6 +220,7 @@ struct ContentView: View {
                             navigateBack()
                         },
                         onTryStyle: { style in
+                            appState.selectedPhoto = photo
                             navigate(to: .styleDetail(style))
                         },
                         onSaveToTimeline: { result in
