@@ -247,7 +247,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-27
-**Current State:** SESSION 15 COMPLETE — PaywallView dark mode fixed, home category selection now persists across navigation, IMAGE_PROMPTS.md created with all 60 multi-angle prompts + Antigravity instructions for batch generation. Multi-angle image generation in progress (Antigravity reads IMAGE_PROMPTS.md and saves directly to Assets.xcassets).
+**Current State:** SESSION 16 IN PROGRESS — Worker `/hair/analyse` endpoint complete and committed (not pushed). Profiles + Hair Timeline feature fully designed with implementation prompt written. Face Analyser partial iOS (model + APIClient + FaceAnalysisView created, not yet wired into ContentView/HomeView — paused for design pivot).
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
@@ -350,19 +350,33 @@ VStack(spacing: 0) {
 
 **iCloud KV note:** Entitlements file created + pbxproj wired. User must also check "Key-value storage" under iCloud in Xcode → Signing & Capabilities to activate provisioning profile sync.
 
-**Session 15 changes (committed, not yet pushed):**
+**Session 15 changes (committed):**
 - PaywallView dark mode: unselected card bg `Color.hairBg` → `Color.hairBgOff`, bottom gradient `.white` → `Color.hairBg`
-- Home category persistence: `homeSelectedCategory` + `homeSearchText` moved from `HomeView @State` → `AppState` so category survives navigation back from style detail
-- `IMAGE_PROMPTS.md` created at repo root: all 60 multi-angle prompts (_3 back, _4 side, _5 three-quarter) for 20 styles, with Antigravity/Gemini save instructions and per-image status tracker
-- Multi-angle sample images: Antigravity reads `IMAGE_PROMPTS.md` and saves directly to `Assets.xcassets/` — update `HairStyle.swift` sampleImages arrays once images land
+- Home category persistence: `homeSelectedCategory` + `homeSearchText` moved from `HomeView @State` → `AppState`
+- `IMAGE_PROMPTS.md` created: all 60 multi-angle prompts with Antigravity instructions
 
-**PENDING BEFORE SUBMISSION — Session 16:**
-1. Wire new _3/_4/_5 images into `HairStyle.swift` sampleImages arrays once Antigravity finishes generating them
-2. Complete IAP metadata in App Store Connect (price + localization + screenshot for credits_5/20/60/200)
-3. App Store screenshots — 1320×2868 (6.9") and 1179×2556 (6.3")
-4. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
+**Session 16 changes (committed, NOT pushed):**
+- Worker `POST /hair/analyse` endpoint: `callGeminiAnalyse()` in gemini.ts uses gemini-2.0-flash (text-only, cheap ~$0.0001) with vision input → returns JSON `{faceShape, undertone, eyeColour, hairColour, recommendations[5]}`. `src/routes/hair/analyse.ts` created. Wired in `index.ts`. Same rate-limit + credit gate as generate. Committed in aurax-api repo (f5facc1).
+- Partial Face Analyser iOS (NOT wired into app yet — paused for design pivot):
+  - `Models/FaceAnalysis.swift` — FaceAnalysisResult + StyleRecommendation Decodable structs
+  - `Services/APIClient.swift` — `analyse(photo:)` method + `analyseURL` constant added
+  - `AppState.swift` — `faceAnalysisError: String?` added
+  - `Views/FaceAnalysisView.swift` — entry screen with photo picker + CTA (not in Screen enum yet)
+- Profiles + Hair Timeline feature: fully designed, implementation prompt written and ready to paste into a new Claude Code session
+- Claude Design export (`Hair Lens - AI.html`) fetched and read — 9 existing screens match current implementation
 
-**Next Step:** Session 16 — wire multi-angle images, IAP metadata, App Store screenshots, TestFlight upload. Then V2 planning: AI Face Analyser feature.
+**PENDING BEFORE SUBMISSION:**
+1. IAP metadata in App Store Connect (price + localization + screenshot for credits_5/20/60/200)
+2. App Store screenshots — 1320×2868 (6.9") and 1179×2556 (6.3")
+3. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
+4. Wire _3/_4/_5 images into `HairStyle.swift` once Antigravity generates them
+
+**V2 — Profiles + Hair Timeline (implementation prompt ready, start fresh session):**
+- Full spec: PersonProfile model, TimelineEntry, ProfilesStore, 6 new views, ContentView wiring, generation flow integration, Face Analyser wired into profiles
+- Worker: `/hair/analyse` already done and deployed-ready
+- iOS Face Analyser partial files already created (see Session 16 changes above) — next session should complete wiring into ContentView + HomeView
+
+**Next Step:** Session 17 — paste Profiles+Timeline implementation prompt into fresh Claude Code session. Then IAP metadata + screenshots + TestFlight.
 
 
 ---

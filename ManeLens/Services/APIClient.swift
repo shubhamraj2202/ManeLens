@@ -25,7 +25,8 @@ enum APIError: Error {
 }
 
 struct APIClient {
-    static let workerURL = "https://aurax-api.auraxai.workers.dev/hair/generate"
+    static let workerURL    = "https://aurax-api.auraxai.workers.dev/hair/generate"
+    static let analyseURL   = "https://aurax-api.auraxai.workers.dev/hair/analyse"
 
     static func generate(
         photo: UIImage,
@@ -89,5 +90,48 @@ struct APIClient {
         }
 
         return image
+    }
+
+    static func analyse(photo: UIImage) async throws -> FaceAnalysisResult {
+        let validation = await FaceValidator.validate(photo)
+        if case .invalid(let reason) = validation {
+            throw APIError.faceValidation(reason: reason)
+        }
+
+        guard let imageBase64 = ImageProcessor.prepare(photo) else {
+            throw APIError.noPhoto
+        }
+
+        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+        let body: [String: String] = ["deviceId": deviceId, "imageBase64": imageBase64]
+
+        guard let url = URL(string: analyseURL) else {
+            throw APIError.generationFailed("Invalid analyse URL")
+        }
+        var urlRequest = URLRequest(url: url, timeoutInterval: 30)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        let data: Data
+        do {
+            (data, _) = try await URLSession.shared.data(for: urlRequest)
+        } catch {
+            throw APIError.network(error)
+        }
+
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw APIError.generationFailed("Unreadable response")
+        }
+
+        if let errorCode = json["error"] as? String {
+            let msg = json["message"] as? String ?? errorCode
+            throw APIError.generationFailed(msg)
+        }
+
+        guard let result = try? JSONDecoder().decode(FaceAnalysisResult.self, from: data) else {
+            throw APIError.generationFailed("Could not parse analysis result")
+        }
+        return result
     }
 }
