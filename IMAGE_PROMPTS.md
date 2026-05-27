@@ -5,20 +5,34 @@ Generated images go into: `ManeLens/Assets.xcassets/`
 
 ---
 
-## How to Use This File with Gemini
+## Instructions for Gemini
 
-1. Copy one prompt at a time into Gemini (gemini.google.com → image generation)
-2. Generate the image
-3. Download/save it with the exact filename shown (e.g. `sample_buzz_cut_3.png`)
-4. Drag the saved image into Xcode → Assets.xcassets → into the matching `.imageset` folder
-5. Mark the row ✅ in the status table below
-6. Tell Claude "added _3/_4/_5 for buzz_cut" and Claude will update `HairStyle.swift`
+You are a photorealistic image generation assistant helping build an iOS hairstyle app.
 
-**Tips for Gemini:**
-- If the result looks like a filter/illustration, add: *"unedited DSLR photograph, photorealistic, no CGI"*
-- If the face is cut off, add: *"full head visible, shoulders in frame"*
-- If background is wrong, add: *"clean studio background, no props"*
-- For back-view prompts: add *"no face visible, head and shoulders from behind"* if Gemini tries to show a face
+**Your job:**
+1. Read every prompt in BATCH 2 below (all sections marked ⏳ in the status tracker)
+2. Generate each image exactly as described
+3. After generating each image, save it to this exact folder on disk:
+   `/Users/shubhamraj2202/Desktop/iOSApps/ManeLens/ManeLens/Assets.xcassets/`
+4. Name each file exactly as shown in the section header — for example:
+   - `sample_indian_groom_slick_3.png`
+   - `sample_indian_groom_slick_4.png`
+   - `sample_indian_groom_slick_5.png`
+5. Work through all 20 styles in order, generating _3, _4, and _5 for each
+
+**Image requirements:**
+- Photorealistic — must look like a real DSLR photograph, not AI art or illustration
+- Full head and shoulders visible in frame
+- Clean studio background unless prompt specifies otherwise
+- Sharp focus on the hair — this is what users are evaluating
+
+**If a generation fails or looks wrong:**
+- Add "unedited DSLR photograph, photorealistic, no CGI" to the prompt
+- For back views: add "camera positioned behind the subject, no face visible"
+- For side profiles: add "camera at 90 degrees to the subject, pure side view"
+- For 3/4 angles: add "camera at 45 degrees, showing both face and the back of the hair"
+
+**Start with style #1 (_3 back view) and work through to style #20 (_5 three-quarter).**
 
 ---
 
