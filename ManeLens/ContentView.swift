@@ -11,6 +11,11 @@ enum Screen {
     case history
     case paywall
     case settings
+    // Profiles
+    case profiles
+    case profileDetail(UUID)
+    case timelineEntryDetail(UUID, UUID)   // profileId, entryId
+    case faceAnalyser(UUID, UIImage)       // profileId, photo
 }
 
 struct ContentView: View {
@@ -40,7 +45,8 @@ struct ContentView: View {
                     onEdit: { style in navigate(to: .editCustomStyle(style)) },
                     onSettings: { navigate(to: .settings) },
                     onHistory: { navigate(to: .history) },
-                    onPaywall: { navigate(to: .paywall) }
+                    onPaywall: { navigate(to: .paywall) },
+                    onProfiles: { navigate(to: .profiles) }
                 )
                 .transition(.opacity)
 
@@ -146,6 +152,82 @@ struct ContentView: View {
                     onGetMore: { navigate(to: .paywall) }
                 )
                 .transition(.move(edge: .trailing))
+
+            // MARK: - Profiles
+
+            case .profiles:
+                ProfilesListView(
+                    appState: appState,
+                    onBack: { navigateBack() },
+                    onSelectProfile: { profile in navigate(to: .profileDetail(profile.id)) }
+                )
+                .transition(.move(edge: .trailing))
+
+            case .profileDetail(let profileId):
+                if let profile = appState.profiles.first(where: { $0.id == profileId }) {
+                    ProfileDetailView(
+                        appState: appState,
+                        profileId: profileId,
+                        onBack: { navigateBack() },
+                        onAnalyse: { prof, photo in
+                            guard appState.credits > 0 else { navigate(to: .paywall); return }
+                            appState.consumeCredit()
+                            navigate(to: .faceAnalyser(prof.id, photo))
+                        },
+                        onUseForStyle: { photo in
+                            appState.selectedPhoto = photo
+                            navigateBack()
+                        },
+                        onEntryDetail: { _, entry in
+                            navigate(to: .timelineEntryDetail(profileId, entry.id))
+                        }
+                    )
+                    .transition(.move(edge: .trailing))
+                    .id(profile.id)
+                }
+
+            case .timelineEntryDetail(let profileId, let entryId):
+                if let profile = appState.profiles.first(where: { $0.id == profileId }) {
+                    TimelineEntryDetailView(
+                        appState: appState,
+                        profile: profile,
+                        entryId: entryId,
+                        onBack: { navigateBack() },
+                        onAnalyse: { prof, photo in
+                            guard appState.credits > 0 else { navigate(to: .paywall); return }
+                            appState.consumeCredit()
+                            navigate(to: .faceAnalyser(prof.id, photo))
+                        },
+                        onGenerateStyle: { photo in
+                            appState.selectedPhoto = photo
+                            // Pop back to home so they can pick a style
+                            screenStack = []
+                            withAnimation { screen = .home }
+                        },
+                        onDeleteEntry: { navigateBack() }
+                    )
+                    .transition(.move(edge: .trailing))
+                }
+
+            case .faceAnalyser(let profileId, let photo):
+                if let profile = appState.profiles.first(where: { $0.id == profileId }) {
+                    FaceAnalyserView(
+                        profile: profile,
+                        photo: photo,
+                        onBack: {
+                            appState.refundCredit()
+                            navigateBack()
+                        },
+                        onTryStyle: { style in
+                            navigate(to: .styleDetail(style))
+                        },
+                        onSaveToTimeline: { result in
+                            saveAnalysisToTimeline(result: result, profile: profile, photo: photo)
+                            navigateBack()
+                        }
+                    )
+                    .transition(.opacity)
+                }
             }
         }
         .preferredColorScheme(appState.themeMode.colorScheme)
@@ -160,6 +242,19 @@ struct ContentView: View {
         }
     }
 
+    // MARK: - Save analysis result as timeline entry
+
+    private func saveAnalysisToTimeline(result: FaceAnalysisResult, profile: PersonProfile, photo: UIImage) {
+        let entryId = UUID()
+        let path = ProfilesStore.shared.savePhoto(photo, profileId: profile.id, entryId: entryId)
+        let topStyle = result.recommendations.first?.styleKey
+        let note = "Face analysis — \(result.faceShapeDisplay) face, \(result.undertoneDisplay) undertone. Top pick: \(topStyle ?? "—")"
+        let entry = TimelineEntry(id: entryId, date: .now, photoPath: path, note: note, styleKey: topStyle)
+        if let idx = appState.profiles.firstIndex(where: { $0.id == profile.id }) {
+            appState.profiles[idx].entries.insert(entry, at: 0)
+        }
+    }
+
     // MARK: - Generation
 
     @MainActor
@@ -170,7 +265,6 @@ struct ContentView: View {
         }
 
         do {
-            // For user-saved custom styles, the prompt rides on the style itself.
             let effectiveStyleKey: String? = (style?.isCustom == true) ? nil : style?.styleKey
             let effectiveCustomPrompt: String? = style?.customPrompt
                 ?? (appState.customPromptText.isEmpty ? nil : appState.customPromptText)
@@ -187,11 +281,10 @@ struct ContentView: View {
 
             appState.generatedImage = result
             if let style { appState.recordGeneration(style: style, original: photo, result: result) }
-            // Direct assignment — don't push .generating onto the back stack so Back → styleDetail
             withAnimation { screen = .result(style) }
 
         } catch is CancellationError {
-            // onCancel already refunded — nothing to do here
+            // onCancel already refunded
         } catch let error as APIError {
             appState.refundCredit()
             if case .paymentRequired = error {
@@ -222,16 +315,20 @@ struct ContentView: View {
 
     private var screenDescription: String {
         switch screen {
-        case .onboarding:           return "onboarding"
-        case .home:                 return "home"
-        case .styleDetail(let s):   return "detail-\(s.id)"
-        case .customPrompt:                 return "custom"
-        case .editCustomStyle(let s):       return "edit-\(s.id)"
-        case .generating:           return "generating"
-        case .result:               return "result"
-        case .history:              return "history"
-        case .paywall:              return "paywall"
-        case .settings:             return "settings"
+        case .onboarding:                        return "onboarding"
+        case .home:                              return "home"
+        case .styleDetail(let s):                return "detail-\(s.id)"
+        case .customPrompt:                      return "custom"
+        case .editCustomStyle(let s):            return "edit-\(s.id)"
+        case .generating:                        return "generating"
+        case .result:                            return "result"
+        case .history:                           return "history"
+        case .paywall:                           return "paywall"
+        case .settings:                          return "settings"
+        case .profiles:                          return "profiles"
+        case .profileDetail(let id):             return "profileDetail-\(id)"
+        case .timelineEntryDetail(let p, let e): return "entry-\(p)-\(e)"
+        case .faceAnalyser(let id, _):           return "analyser-\(id)"
         }
     }
 }

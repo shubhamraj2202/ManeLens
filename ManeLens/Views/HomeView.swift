@@ -8,6 +8,7 @@ struct HomeView: View {
     var onSettings: () -> Void
     var onHistory: () -> Void
     var onPaywall: () -> Void
+    var onProfiles: () -> Void
 
     private var allStyles: [HairStyle] {
         HairStyle.catalog + appState.customStyles
@@ -70,6 +71,12 @@ struct HomeView: View {
             // Right controls
             Button(action: onPaywall) {
                 CreditPill(credits: appState.credits)
+            }
+
+            Button(action: onProfiles) {
+                Image(systemName: "person.2")
+                    .font(.system(size: 18))
+                    .foregroundStyle(Color.hairText)
             }
 
             Button(action: onHistory) {

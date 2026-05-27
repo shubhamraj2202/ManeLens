@@ -49,9 +49,14 @@ class AppState {
         didSet { CustomStylesStore.shared.save(customStyles) }
     }
 
+    var profiles: [PersonProfile] = [] {
+        didSet { ProfilesStore.shared.save(profiles) }
+    }
+
     init() {
         self.history = HistoryStore.shared.load()
         self.customStyles = CustomStylesStore.shared.load()
+        self.profiles = ProfilesStore.shared.load()
     }
 
     func saveCustomStyle(name: String, prompt: String, sampleImages: [UIImage] = []) {
