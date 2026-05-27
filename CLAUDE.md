@@ -247,7 +247,7 @@ Plus 3 free credits on first install. Pricing rationale: one bad haircut costs �
 ## Session Status
 
 **Last Updated:** 2026-05-27
-**Current State:** SESSION 15 COMPLETED (Nearly Done) — 39 out of 40 photorealistic sample style images successfully generated, processed into Xcode Assets, committed, and pushed to GitHub. Hit Gemini Imagen quota limit on the very last image (sample_reception_waves_2), which will reset in ~11 hours.
+**Current State:** SESSION 15 COMPLETE — PaywallView dark mode fixed, home category selection now persists across navigation, IMAGE_PROMPTS.md created with all 60 multi-angle prompts + Antigravity instructions for batch generation. Multi-angle image generation in progress (Antigravity reads IMAGE_PROMPTS.md and saves directly to Assets.xcassets).
 
 **What's Working:**
 - Full generate pipeline working end-to-end on real device
@@ -350,14 +350,19 @@ VStack(spacing: 0) {
 
 **iCloud KV note:** Entitlements file created + pbxproj wired. User must also check "Key-value storage" under iCloud in Xcode → Signing & Capabilities to activate provisioning profile sync.
 
-**PENDING BEFORE SUBMISSION — Session 14:**
-1. Add remaining 23 sample PNGs (female styles) to Assets.xcassets + populate sampleImages in HairStyle.swift
-2. Create `hairLens-privacy.html` + `hairLens-terms.html` on shubhamraj2202.github.io
-3. Complete IAP metadata in App Store Connect (price + localization + screenshot per product)
-4. App Store screenshots — 1320×2868 (6.9") and 1179×2556 (6.3")
-5. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
+**Session 15 changes (committed, not yet pushed):**
+- PaywallView dark mode: unselected card bg `Color.hairBg` → `Color.hairBgOff`, bottom gradient `.white` → `Color.hairBg`
+- Home category persistence: `homeSelectedCategory` + `homeSearchText` moved from `HomeView @State` → `AppState` so category survives navigation back from style detail
+- `IMAGE_PROMPTS.md` created at repo root: all 60 multi-angle prompts (_3 back, _4 side, _5 three-quarter) for 20 styles, with Antigravity/Gemini save instructions and per-image status tracker
+- Multi-angle sample images: Antigravity reads `IMAGE_PROMPTS.md` and saves directly to `Assets.xcassets/` — update `HairStyle.swift` sampleImages arrays once images land
 
-**Next Step:** Session 14 — female sample images, then TestFlight.
+**PENDING BEFORE SUBMISSION — Session 16:**
+1. Wire new _3/_4/_5 images into `HairStyle.swift` sampleImages arrays once Antigravity finishes generating them
+2. Complete IAP metadata in App Store Connect (price + localization + screenshot for credits_5/20/60/200)
+3. App Store screenshots — 1320×2868 (6.9") and 1179×2556 (6.3")
+4. Archive → Upload → TestFlight → add shubhamraj2202@gmail.com as internal tester
+
+**Next Step:** Session 16 — wire multi-angle images, IAP metadata, App Store screenshots, TestFlight upload. Then V2 planning: AI Face Analyser feature.
 
 
 ---
@@ -381,6 +386,30 @@ Apply barber-grade beard style transformations independently of (or alongside) h
 - **FaceValidator:** Add `VNDetectFaceLandmarksRequest` check for lower-face landmark coverage (chin, jaw) before beard calls
 - **Constraint:** `buildBeardPrompt()` must go through same Session 0–style regression before shipping (5 beard styles × 10 selfies with beards/stubble)
 - **File changes when implemented:** `HairStyle.swift` (add `StyleType: hair | beard | both`), `StyleCatalog.swift`, `prompts.ts` (add `buildBeardPrompt()`), `StyleDetailView.swift` (beard toggle), `FaceValidator.swift`
+
+### AI Face Analyser (V2 — HIGH PRIORITY)
+Analyse the user's selfie using Gemini vision to detect face shape, skin undertone, eye colour, and current hair colour — then recommend the 5 best styles from the catalog for their specific features.
+
+- **UX flow:** New "Analyse My Face" button on HomeView header (wand icon) → user uploads/takes selfie → animated "Analysing…" screen with step-by-step progress bars (scanning eye & skin tones → detecting hair colour type → analysing undertone → identifying best styles) → results screen showing top 5 recommended styles with explanation cards ("Your oval face suits…")
+- **Analysing screen:** Progress bars per step (like competitor HairApp), face preview in oval crop at top, each step animates in sequence
+- **Results screen:** Ranked style cards with a % match badge, short personalised reason per style ("Your warm undertone pairs perfectly with balayage"), tap → goes straight to StyleDetailView
+- **Worker:** New endpoint `POST /hair/analyse` — sends selfie base64, Gemini returns JSON: `{ faceShape, undertone, eyeColour, hairColour, recommendedStyleKeys[] }`
+- **Gemini prompt:** "Analyse this portrait. Return JSON with: faceShape (oval/round/square/heart/oblong), skinUndertone (warm/cool/neutral), eyeColour, currentHairColour, top5StyleKeys from this list: [catalog keys]. Explain each recommendation in one sentence."
+- **On-device:** Use Vision `VNDetectFaceRectanglesRequest` to confirm face present before sending — same validation as generate flow
+- **Credit cost:** 1 credit per analysis (same as generation — one Gemini call)
+- **New files:** `FaceAnalysisView.swift`, `AnalysingView.swift`, `FaceAnalysisResultView.swift`, `src/routes/hair/analyse.ts` on Worker
+- **New Screen cases:** `Screen.faceAnalysis`, `Screen.analysingFace`, `Screen.faceAnalysisResult(FaceAnalysisResult)`
+
+### Reference Photo Style Matching
+Upload an inspiration photo (e.g. a celebrity or magazine cut) and the app extracts the style and applies it to the user's selfie.
+- **UX:** Second optional photo upload zone on Style Detail + Custom Prompt screens, labelled "Add reference photo"
+- **Worker:** When `referenceImageBase64` is present, `buildHairPrompt()` switches to a two-image prompt
+- **File changes when implemented:** `CustomPromptView.swift`, `StyleDetailView.swift`, `PhotoUploadZone.swift`, `APIClient.swift`, `prompts.ts`
+
+### Beard Styling
+Apply barber-grade beard style transformations independently of (or alongside) hair changes.
+- **Catalog additions:** 5 initial beard styles — Clean Shave, Short Box Beard, Full Beard, Goatee, Designer Stubble
+- **File changes when implemented:** `HairStyle.swift`, `StyleCatalog.swift`, `prompts.ts`, `StyleDetailView.swift`, `FaceValidator.swift`
 
 ### Other (lower priority)
 - Real-time AR live preview (ARKit + on-device hair segmentation)
